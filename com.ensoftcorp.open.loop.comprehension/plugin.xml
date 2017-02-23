@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <!-- adds the prioritized codemap stages -->
+   <extension point="com.ensoftcorp.open.commons.codemap">
+      <codemap class="com.ensoftcorp.open.loop.comprehension.taint.CallSiteOperatorTaintOverlayCodemapStage"></codemap>
+   </extension>
+   <extension point="com.ensoftcorp.open.commons.codemap">
+      <codemap class="com.ensoftcorp.open.loop.comprehension.analysis.LoopCatalogCodemapStage"></codemap>
+   </extension>
+
+</plugin>
