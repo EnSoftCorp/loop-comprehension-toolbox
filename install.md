@@ -18,7 +18,7 @@ Follow the steps below to install the Loop Comprehension Toolbox plugin from the
 7. When the installation completes, restart Eclipse.
 
 ## Installing from Source
-If you want to install from source for bleeding edge changes, first grab a copy of the [source](https://github.com/EnSoftCorp/loop-comprehension-toolbox) repository. In the Eclipse workspace, import the Eclipse plugin project located in the source repository.  Right click on the project and select `Export`.  Select `Plug-in Development` &gt; `Deployable plug-ins and fragments`.  Select the `Install into host. Repository:` radio box and click `Finish`.  Press `OK` for the notice about unsigned software.  Once Eclipse restarts the plugin will be installed and it is advisable to close or remove the `com.ensoftcorp.open.slice` project from the workspace.
+If you want to install from source for bleeding edge changes, first grab a copy of the [source](https://github.com/EnSoftCorp/loop-comprehension-toolbox) repository. In the Eclipse workspace, import the Eclipse plugin project located in the source repository.  Right click on the project and select `Export`.  Select `Plug-in Development` &gt; `Deployable plug-ins and fragments`.  Select the `Install into host. Repository:` radio box and click `Finish`.  Press `OK` for the notice about unsigned software.  Once Eclipse restarts the plugin will be installed and it is advisable to close or remove the `com.ensoftcorp.open.loop.comprehension` project from the workspace.
 
 ## Changelog
 Note that version numbers are based off [Atlas](http://www.ensoftcorp.com/atlas/download/) version numbers.
