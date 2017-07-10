@@ -12,11 +12,23 @@ import com.ensoftcorp.open.loop.comprehension.utils.LoopPatternConstants;
 import com.ensoftcorp.open.loop.comprehension.utils.LoopUtils;
 import com.ensoftcorp.open.loop.comprehension.utils.MethodSignatureMatcher;
 import com.ensoftcorp.open.loop.comprehension.utils.MethodSignatures;
-// import org.rulersoftware.taint.TaintOverlay;
 import com.ensoftcorp.open.loop.comprehension.utils.Tags;
 
-public class OperationAnalyzer {
+/**
+ * Analyzes Loop operations for monotonicity and applies appropriate tags
+ * 
+ * @author Payas Awadhutkar
+ */
+
+public class MonotonicityAnalyzer {
 	
+	/*//tags
+	private static final String INCREMENT = "increase";
+	private static final String DECREMENT = "decrease";
+	//private static final String tag3 = "no update";
+	private static final String UPDATE = "unsure update";
+	//private static final String tag5 = "unknown";
+	*/ 
 	public static void applyMonotonicityTagsOnControlFlow(Q loopHeader) {
 		//loop cfg
 		Q loopCfg = LoopUtils.getControlFlowMembers(loopHeader.eval().nodes().getFirst());

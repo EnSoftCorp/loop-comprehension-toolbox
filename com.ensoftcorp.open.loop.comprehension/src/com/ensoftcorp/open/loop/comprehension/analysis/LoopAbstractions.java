@@ -2,17 +2,22 @@ package com.ensoftcorp.open.loop.comprehension.analysis;
 
 import java.awt.Color;
 
+import com.ensoftcorp.open.loop.comprehension.utils.TerminatingConditions;
+import com.ensoftcorp.open.loop.comprehension.taint.TaintOverlay;
+
 import com.ensoftcorp.atlas.core.highlight.Highlighter;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
-import com.ensoftcorp.open.commons.analysis.CFG;
-import com.ensoftcorp.open.commons.analysis.StandardQueries;
+import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.jimple.commons.loops.DecompiledLoopIdentification.CFGNode;
-import com.ensoftcorp.open.loop.comprehension.taint.TaintOverlay;
-import com.ensoftcorp.open.loop.comprehension.utils.TerminatingConditions;
-// import org.rulersoftware.taint.TaintOverlay;
-import com.ensoftcorp.open.pcg.factory.PCGFactory;
+import com.ensoftcorp.open.pcg.common.PCGFactory;
+
+/**
+ * Abstractions to compute Loop Characterizations
+ * 
+ * @author Payas Awadhutkar
+ */
 
 public class LoopAbstractions {
 
@@ -71,10 +76,10 @@ public class LoopAbstractions {
 		Q taints = Common.universe().edgesTaggedWithAny(TaintOverlay.Taint);
 
 		// method containing loop header
-		Q method = StandardQueries.getContainingFunctions(loopHeader);
+		Q method = CommonQueries.getContainingFunctions(loopHeader);
 
 		// method contents
-		Q methodContents = StandardQueries.localDeclarations(method);
+		Q methodContents = CommonQueries.localDeclarations(method);
 
 		// local taints influencing loop termination (taint events)
 		Q conditions = tc.children().nodesTaggedWithAny(XCSG.DataFlowCondition);
@@ -117,10 +122,10 @@ public class LoopAbstractions {
 		Q taints = Common.universe().edgesTaggedWithAny(TaintOverlay.Taint).differenceEdges(Common.edges(TaintOverlay.OVERLAY_OPERATOR_CONSTRUCTOR_SHORT_CIRCUIT));;
 
 		// method containing loop header
-		Q method = StandardQueries.getContainingFunctions(loopHeader);
+		Q method = CommonQueries.getContainingFunctions(loopHeader);
 
 		// method contents
-		Q methodContents = StandardQueries.localDeclarations(method);
+		Q methodContents = CommonQueries.localDeclarations(method);
 
 		// local taints influencing loop termination (taint events)
 		Q conditions = tc.children().nodesTaggedWithAny(XCSG.DataFlowCondition);
@@ -166,11 +171,7 @@ public class LoopAbstractions {
 		// taint roots
 		Q taintRoots = taintGraph.roots().parent();
 		// operators
-		Q operators = taintGraph.nodesTaggedWithAny("Overlay.Taint.Operator").parent();
-		// method containing loop header
-		Q method = StandardQueries.getContainingFunctions(loopHeader);
-		// method Cfg
-		Q methodCfg = CFG.cfg(method);
+		Q operators = taintGraph.nodesTaggedWithAny(TaintOverlay.OVERLAY_OPERATOR).parent();
 		// loop Cfg
 		Q loopCfg = LoopAbstractions.loopControlFlowGraph(loopHeader);
 		Q callsites = loopCfg.children().nodesTaggedWithAny(XCSG.CallSite).parent();
@@ -182,7 +183,7 @@ public class LoopAbstractions {
 		h.highlightNodes(conditions, Color.RED);
 		h.highlightNodes(loopHeader, Color.YELLOW);
 		// Efg
-		Q taintEfg = PCGFactory.PCG(methodCfg, events);
+		Q taintEfg = PCGFactory.create(events).getPCG();
 		return taintEfg;
 	}
 

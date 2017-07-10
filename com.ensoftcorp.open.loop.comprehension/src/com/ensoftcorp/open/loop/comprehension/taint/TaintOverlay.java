@@ -23,7 +23,7 @@ public class TaintOverlay {
 	private static final String INDEX = Index.INDEX_VIEW_TAG;
 	
 	
-	private static final String OVERLAY_OPERATOR = "Overlay.Taint.Operator";
+	public static final String OVERLAY_OPERATOR = "Overlay.Taint.Operator";
 
 	
 	public static final String OVERLAY_TAINT_BYPASSED_INTERPROCEDURAL_DATA_FLOW = "Overlay.Taint.Bypassed_InterproceduralDataFlow";
@@ -60,7 +60,7 @@ public class TaintOverlay {
 			
 			AtlasSet<Node> ns = callsites.eval().nodes();
 			for (Node callsite : ns) {
-				Q targetMethods = CallSiteAnalysis.getTargetMethods(callsite);
+				Q targetMethods = Common.toQ(CallSiteAnalysis.getTargetMethods(callsite));
 				AtlasSet<Node> nonJDKtargets = targetMethods.difference(jdkMethods).eval().nodes();
 				if (nonJDKtargets.isEmpty()) {
 					// all targets are in JDK

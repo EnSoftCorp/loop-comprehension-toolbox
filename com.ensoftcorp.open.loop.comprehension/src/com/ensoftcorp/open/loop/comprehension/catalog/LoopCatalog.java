@@ -19,7 +19,7 @@ import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.query.Query;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
-import com.ensoftcorp.open.commons.analysis.StandardQueries;
+import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.commons.utilities.DisplayUtils;
 import com.ensoftcorp.open.java.commons.subsystems.CompressionSubsystem;
 import com.ensoftcorp.open.java.commons.subsystems.CryptoSubsystem;
@@ -43,12 +43,18 @@ import com.ensoftcorp.open.java.commons.subsystems.UISubsystem;
 import com.ensoftcorp.open.jimple.commons.loops.BoundaryConditions;
 import com.ensoftcorp.open.jimple.commons.loops.DecompiledLoopIdentification.CFGNode;
 import com.ensoftcorp.open.loop.comprehension.analysis.LoopAbstractions;
-import com.ensoftcorp.open.loop.comprehension.analysis.LoopPatternMatcher;
+import com.ensoftcorp.open.loop.comprehension.analysis.Monotonicity;
 import com.ensoftcorp.open.loop.comprehension.log.Log;
 import com.ensoftcorp.open.loop.comprehension.utils.LoopPatternConstants;
 import com.ensoftcorp.open.loop.comprehension.utils.LoopUtils;
 import com.ensoftcorp.open.loop.comprehension.utils.PathProperty;
 import com.ensoftcorp.open.loop.comprehension.utils.TerminatingConditions;
+
+/**
+ * Generates Loop Catalog
+ * 
+ * @author Payas Awadhutkar
+ */
 
 public class LoopCatalog {
 	
@@ -422,7 +428,7 @@ public class LoopCatalog {
 				continue;
 			}
 			writeLoopLocationStats(loop, output);
-			bounds = LoopPatternMatcher.bounds(Common.toQ(loop));
+			bounds = Monotonicity.bounds(Common.toQ(loop));
 			
 			output.write(conditions.eval().nodes().size() + ",");
 			if(loop.taggedWith(LoopPatternConstants.MONOTONIC_LOOP)) {
@@ -494,7 +500,7 @@ public class LoopCatalog {
 			}
 			Q lcefg = LoopAbstractions.getTerminationPCG(Common.toQ(loop));
 			Q tg = LoopAbstractions.taintGraphWithoutCycles(Common.toQ(loop));
-			//Q method = StandardQueries.getContainingFunctions(Common.toQ(loop));
+			//Q method = CommonQueries.getContainingFunctions(Common.toQ(loop));
 			//Q df = method.forwardOn(Common.edges(XCSG.Contains)).induce(Common.edges(XCSG.LocalDataFlow));
 			Q lcfg = lcefg.difference(Common.universe().nodesTaggedWithAny("EventFlow_Master_Entry","EventFlow_Master_Exit"));
 			lcfg = Common.universe().edgesTaggedWithAny(XCSG.ControlFlow_Edge).between(Common.toQ(loop), lcfg.nodesTaggedWithAny(BoundaryConditions.BOUNDARY_CONDITION));
@@ -718,8 +724,8 @@ public class LoopCatalog {
 		Highlighter h = highlighterForLoopDepth(lcefg);
 		h.highlightNodes(Common.toQ(loop), Color.YELLOW);
 		h.highlightNodes(conditions, Color.RED);
-		String typeName = StandardQueries.getContainingFunctions(Common.toQ(loop)).reverseStepOn(Common.universe().edgesTaggedWithAny(XCSG.Contains),1).roots().eval().nodes().getFirst().getAttr(XCSG.name).toString();
-		String methodName = StandardQueries.getContainingFunction(loop).getAttr(XCSG.name).toString();
+		String typeName = CommonQueries.getContainingFunctions(Common.toQ(loop)).reverseStepOn(Common.universe().edgesTaggedWithAny(XCSG.Contains),1).roots().eval().nodes().getFirst().getAttr(XCSG.name).toString();
+		String methodName = CommonQueries.getContainingFunction(loop).getAttr(XCSG.name).toString();
 		String loopStatement = loop.getAttr(XCSG.name).toString().substring(0, loop.getAttr(XCSG.name).toString().indexOf(":"));
 		String filename = typeName + "-" + methodName + "-" + loopStatement;
 		//change directory path before running

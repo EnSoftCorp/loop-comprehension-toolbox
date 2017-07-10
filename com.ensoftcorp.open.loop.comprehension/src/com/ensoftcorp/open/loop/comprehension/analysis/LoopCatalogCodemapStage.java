@@ -1,6 +1,7 @@
 package com.ensoftcorp.open.loop.comprehension.analysis;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.open.commons.codemap.PrioritizedCodemapStage;
@@ -45,7 +46,7 @@ public class LoopCatalogCodemapStage extends PrioritizedCodemapStage {
 	public void performIndexing(IProgressMonitor monitor) {
 		Log.info("Cataloging loops...");
 		for(Node loopHeader : Common.universe().nodesTaggedWithAny(CFGNode.LOOP_HEADER).eval().nodes()){
-			LoopPatternMatcher.bounds(Common.toQ(loopHeader));
+			Monotonicity.bounds(Common.toQ(loopHeader));
 		}
 	}
 

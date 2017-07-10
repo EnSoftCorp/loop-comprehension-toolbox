@@ -5,19 +5,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-// import org.rulersoftware.taint.TaintOverlay;
-
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
-import com.ensoftcorp.atlas.core.script.CommonQueries;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.atlas.core.xcsg.XCSG.Java;
-import com.ensoftcorp.open.commons.analysis.StandardQueries;
-import com.ensoftcorp.open.java.commons.analysis.CallSiteAnalysis;
+import com.ensoftcorp.open.commons.analysis.CallSiteAnalysis;
+import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.jimple.commons.loops.BoundaryConditions;
 import com.ensoftcorp.open.jimple.commons.loops.DecompiledLoopIdentification.CFGNode;
 import com.ensoftcorp.open.loop.comprehension.log.Log;
@@ -30,11 +27,17 @@ import com.ensoftcorp.open.loop.comprehension.utils.MethodSignatureMatcher;
 import com.ensoftcorp.open.loop.comprehension.utils.MethodSignatures;
 import com.ensoftcorp.open.loop.comprehension.utils.Tags;
 
-public class LoopPatternMatcher {
+/**
+ * Computes Monotonicity, detects Loop Patterns and computes iteration bound if possible
+ * 
+ * @author Payas Awadhutkar
+ */
+
+public class Monotonicity {
 	
 
 	public static List<String> getComparatorTags(){
-		return  Arrays.asList(new String[]{XCSG.EqualTo,XCSG.NotEqualTo,XCSG.LessThan,XCSG.LessThanOrEqualTo,XCSG.GreaterThan,XCSG.GreaterThanOrEqualTo,XCSG.Jimple.Comparison,XCSG.Jimple.ComparisonDefaultGreaterThan,XCSG.Jimple.ComparisonDefaultLessThan});
+		return Arrays.asList(new String[]{XCSG.EqualTo,XCSG.NotEqualTo,XCSG.LessThan,XCSG.LessThanOrEqualTo,XCSG.GreaterThan,XCSG.GreaterThanOrEqualTo,XCSG.Jimple.Comparison,XCSG.Jimple.ComparisonDefaultGreaterThan,XCSG.Jimple.ComparisonDefaultLessThan});
 	}
 	
 	public static Q getTaintWithoutCycleEdges(){
@@ -65,10 +68,10 @@ public class LoopPatternMatcher {
 		Q taints = Common.universe().edgesTaggedWithAny(TaintOverlay.Taint).differenceEdges(Common.edges(TaintOverlay.OVERLAY_OPERATOR_CONSTRUCTOR_SHORT_CIRCUIT));
 
 		// method containing loop header
-		Q method = StandardQueries.getContainingFunctions(loopHeader);
+		Q method = CommonQueries.getContainingFunctions(loopHeader);
 
 		// method contents
-		Q methodContents = StandardQueries.localDeclarations(method);
+		Q methodContents = CommonQueries.localDeclarations(method);
 
 		// local taints influencing loop termination (taint events)
 		Q conditions = tc.children().nodesTaggedWithAny(XCSG.DataFlowCondition);
@@ -106,7 +109,7 @@ public class LoopPatternMatcher {
 			throw new RuntimeException("Not a loop header");
 		}
 		
-		OperationAnalyzer.applyMonotonicityTagsOnControlFlow(loopHeader);
+		MonotonicityAnalyzer.applyMonotonicityTagsOnControlFlow(loopHeader);
 		
 		Q taintGraph = LoopAbstractions.taintGraphWithoutCycles(loopHeader);
 		Q roots = taintGraph.roots();
@@ -207,13 +210,13 @@ public class LoopPatternMatcher {
 			throw new RuntimeException("Not a loop header");
 		}
 
-		Log.info("Start bound analysis for loop header " + loopHeader.eval().nodes().one().getAttr(CFGNode.LOOP_HEADER_ID));
+//		Log.info("Start bound analysis for loop header " + loopHeader.eval().nodes().one().getAttr(CFGNode.LOOP_HEADER_ID));
 		
 		// stores result to return it stats
 		String[] bounds = new String[2];
 		bounds[0] = bounds[1] = "";
  		// improved tagging
-		OperationAnalyzer.applyMonotonicityTagsOnDataFlow(loopHeader);
+		MonotonicityAnalyzer.applyMonotonicityTagsOnDataFlow(loopHeader);
 		
 		// check monotonicity
 		monotonicity(loopHeader);
@@ -250,10 +253,10 @@ public class LoopPatternMatcher {
 		
 		if(loopTerminationTaintGraph.edgesTaggedWithAny(TaintOverlay.OVERLAY_OPERATOR_CONSTRUCTOR_SHORT_CIRCUIT).eval().edges().size() != 0) {
 			// method containing loop header
-			Q method = StandardQueries.getContainingFunctions(loopHeader);
+			Q method = CommonQueries.getContainingFunctions(loopHeader);
 			
 			// method contents
-			Q methodContents = StandardQueries.localDeclarations(method);
+			Q methodContents = CommonQueries.localDeclarations(method);
 			
 			// getting rid of cycles if any left (there is a possibility)
 			Q leaves = loopTerminationTaintGraph.leaves();
@@ -521,14 +524,14 @@ public class LoopPatternMatcher {
 			bounds[1] = upperBound.getAttr(XCSG.name).toString();
 			//Tags.setTag(loopHeader, "Bounded by " + bounds[0] + " and " + bounds[1]);
 			Tags.setTag(loopHeader, LoopPatternConstants.MONOTONICITY_PATTERN_LOCAL_PRIMITIVE);
-			Log.info("Tag loop header bound");
+//			Log.info("Tag loop header bound");
 		}
 		else if(lowerBound.taggedWith(XCSG.Literal) && upperBound.taggedWith(XCSG.Java.ArrayLengthOperator)) {
 			bounds[0] = lowerBound.getAttr(XCSG.name).toString();
 			bounds[1] = upperBound.getAttr(XCSG.name).toString() + " (array length) ";
 			//Tags.setTag(loopHeader, "Bounded by " + bounds[0] + " and " + bounds[1]);
 			Tags.setTag(loopHeader, LoopPatternConstants.MONOTONICITY_PATTERN_LOCAL_ARRAY);
-			Log.info("Tag loop header bound");
+//			Log.info("Tag loop header bound");
 		}
 		else if(lowerBound.taggedWith(XCSG.Instantiation) && upperBound.taggedWith(XCSG.CallSite)) {
 			lowerBound = getSuccessor(loopTerminationTaintGraph,Common.toQ(lowerBound)).eval().nodes().one();
@@ -537,7 +540,7 @@ public class LoopPatternMatcher {
 			bounds[1] = "hasNext API " + upperBound.getAttr(XCSG.name).toString();
 			//Tags.setTag(loopHeader, "Bounded by " + bounds[0] + " and " + bounds[1]);
 			Tags.setTag(loopHeader, LoopPatternConstants.MONOTONICITY_PATTERN_LOCAL_COLLECTION);
-			Log.info("Tag loop header bound");
+//			Log.info("Tag loop header bound");
 		}
 		/*if(lowerBound.taggedWith(XCSG.Assignment) && upperBound.taggedWith(XCSG.Instantiation)) {
 			bounds[0] = "String " + lowerBound.getAttr(XCSG.name).toString();
@@ -552,14 +555,14 @@ public class LoopPatternMatcher {
 				bounds[1] = "hasNext API " + upperBound.getAttr(XCSG.name).toString();
 				//Tags.setTag(loopHeader, bounds[0] + " and " + bounds[1]);
 				Tags.setTag(loopHeader, LoopPatternConstants.MONOTONICITY_PATTERN_CALLSITE_COLLECTION);
-				Log.info("Tag loop header bound");
+//				Log.info("Tag loop header bound");
 		}
 		else if(lowerBound.taggedWith(XCSG.CallSite) && upperBound.taggedWith(XCSG.Java.ArrayLengthOperator)) {
 			bounds[0] = "array formed by callsite " + lowerBound.getAttr(XCSG.name).toString();
 			bounds[1] = "length";
 			//Tags.setTag(loopHeader, "Bounded by " + bounds[0] + " and its " + bounds[1]);
 			Tags.setTag(loopHeader, LoopPatternConstants.MONOTONICITY_PATTERN_CALLSITE_ARRAY);
-			Log.info("Tag loop header bound");
+//			Log.info("Tag loop header bound");
 		}
 		else if(lowerBound.taggedWith(XCSG.Parameter)) {
 			if(upperBound.taggedWith(XCSG.CallSite)) {
@@ -568,7 +571,7 @@ public class LoopPatternMatcher {
 				bounds[1] = "hasNext API " + upperBound.getAttr(XCSG.name).toString();
 				//Tags.setTag(loopHeader, bounds[0] + " and " + bounds[1]);
 				Tags.setTag(loopHeader, LoopPatternConstants.MONOTONICITY_PATTERN_PARAMETER_COLLECTION);
-				Log.info("Tag loop header bound");
+//				Log.info("Tag loop header bound");
 			}
 			if(upperBound.taggedWith(XCSG.Java.ArrayLengthOperator)) {
 				bounds[0] = "array formed by parameter " + lowerBound.getAttr(XCSG.name).toString();
@@ -590,14 +593,14 @@ public class LoopPatternMatcher {
 					//Tags.setTag(loopHeader, "Bounded by " + bounds[0] + " and " + bounds[1]);
 					Tags.setTag(loopHeader, LoopPatternConstants.MONOTONICITY_PATTERN_FIELD_PRIMITIVE);
 				}
-				Log.info("Tag loop header bound");
+//				Log.info("Tag loop header bound");
 			}
 			else if(upperBound.taggedWith(XCSG.Literal)) {
 				bounds[0] = "field " + lowerBound.getAttr(XCSG.name).toString();
 				bounds[1] = upperBound.getAttr(XCSG.name).toString();
 				//Tags.setTag(loopHeader, "Bounded by " + bounds[0] + " and " + bounds[1]);
 				Tags.setTag(loopHeader, LoopPatternConstants.MONOTONICITY_PATTERN_FIELD_PRIMITIVE);
-				Log.info("Tag loop header bound");
+//				Log.info("Tag loop header bound");
 			}
 			else if(upperBound.taggedWith(XCSG.CallSite)) {
 				upperBound = getSuccessor(loopTerminationTaintGraph,Common.toQ(upperBound)).eval().nodes().one();
@@ -605,14 +608,14 @@ public class LoopPatternMatcher {
 				bounds[1] = "hasNext API " + upperBound.getAttr(XCSG.name).toString();
 				Tags.setTag(loopHeader, "Bounded by " + bounds[0] + " and " + bounds[1]);
 				Tags.setTag(loopHeader, LoopPatternConstants.MONOTONICITY_PATTERN_FIELD_COLLECTION);
-				Log.info("Tag loop header bound");
+//				Log.info("Tag loop header bound");
 			}
 			else {
 				bounds[0] = "field " + lowerBound.getAttr(XCSG.name).toString();
 				bounds[1] = "field " + upperBound.getAttr(XCSG.name).toString();
 				//Tags.setTag(loopHeader, "Bounded by " + bounds[0] + " and " + bounds[1]);
 				Tags.setTag(loopHeader, LoopPatternConstants.MONOTONICITY_PATTERN_FIELD_PRIMITIVE);
-				Log.info("Tag loop header bound");
+//				Log.info("Tag loop header bound");
 			}
 		}
 		else if(upperBound.taggedWith(XCSG.CallSite)){
@@ -620,10 +623,10 @@ public class LoopPatternMatcher {
 			bounds[0] = "unknown lowerbound " + lowerBound.getAttr(XCSG.name).toString();
 			bounds[1] = "API " + upperBound.getAttr(XCSG.name).toString();
 			Tags.setTag(loopHeader, LoopPatternConstants.MONOTONICITY_PATTERN_CALLSITE_UNKNOWN_COMPARATOR);
-			Log.info("Tag loop header bound");
+//			Log.info("Tag loop header bound");
 			
 		}
-		Log.info("After Tag loop header bound");
+//		Log.info("After Tag loop header bound");
 		return bounds;
 		
 		/*// external roots
@@ -726,7 +729,7 @@ public class LoopPatternMatcher {
 					//bounds[1] = callsite.getAttr(XCSG.name).toString() + " being compared to " + type;
 					bounds[1] = callsites.eval().nodes().one().getAttr(XCSG.name).toString() + "being compared to " + type;
 					Tags.setTag(loopHeader, ioTag);
-					Log.info("Tag loop header bound");
+//					Log.info("Tag loop header bound");
 					return bounds;
 				}
 			}
@@ -735,7 +738,7 @@ public class LoopPatternMatcher {
 				//bounds[1] = targetPackage(callsites) + "being compared to " + type;
 				bounds[1] = callsites.eval().nodes().one().getAttr(XCSG.name).toString() + "being compared to " + type;
 				Tags.setTag(loopHeader, apiTag);
-				Log.info("Tag loop header bound");
+//				Log.info("Tag loop header bound");
 				return bounds;
 			}
 		}
@@ -788,7 +791,7 @@ public class LoopPatternMatcher {
 					bounds[0] = ioBound;
 					bounds[1] = root.getAttr(XCSG.name).toString() + " being compared to " + type;
 					Tags.setTag(loopHeader, ioTag);
-					Log.info("Tag loop header bound");
+//					Log.info("Tag loop header bound");
 					return bounds;
 				}
 				else {
@@ -796,7 +799,7 @@ public class LoopPatternMatcher {
 					//bounds[1] = targetPackage(Common.toQ(root)) + "being compared to " + type;
 					bounds[1] = root.getAttr(XCSG.name).toString() + "being compared to " + type;
 					Tags.setTag(loopHeader, apiTag);
-					Log.info("Tag loop header bound");
+//					Log.info("Tag loop header bound");
 					return bounds;
 				}
 			}
@@ -816,7 +819,7 @@ public class LoopPatternMatcher {
 					//bounds[1] = callsite.getAttr(XCSG.name).toString() + " being compared to " + type;
 					bounds[1] = callsites.eval().nodes().one().getAttr(XCSG.name).toString() + "being compared to " + type;
 					Tags.setTag(loopHeader, ioTag);
-					Log.info("Tag loop header bound");
+//					Log.info("Tag loop header bound");
 					return bounds;
 				}
 			}
@@ -825,7 +828,7 @@ public class LoopPatternMatcher {
 				//bounds[1] = targetPackage(callsites) + "being compared to " + type;
 				bounds[1] = callsites.eval().nodes().one().getAttr(XCSG.name).toString() + "being compared to " + type;
 				Tags.setTag(loopHeader, apiTag);
-				Log.info("Tag loop header bound");
+//				Log.info("Tag loop header bound");
 				return bounds;
 			}
 		}
@@ -851,7 +854,7 @@ public class LoopPatternMatcher {
 					bounds[0] = ioBound;
 					bounds[1] = callsite.getAttr(XCSG.name).toString() + " being compared to " + type;
 					Tags.setTag(loopHeader, ioTag);
-					Log.info("Tag loop header bound");
+//					Log.info("Tag loop header bound");
 					return bounds;
 				}
 			}
@@ -860,7 +863,7 @@ public class LoopPatternMatcher {
 				//bounds[1] = targetPackage(callsites) + "being compared to " + type;
 				bounds[1] = callsites.eval().nodes().one().getAttr(XCSG.name).toString() + "being compared to " + type;
 				Tags.setTag(loopHeader, apiTag);
-				Log.info("Tag loop header bound");
+//				Log.info("Tag loop header bound");
 				return bounds;
 			}
 			
@@ -871,8 +874,8 @@ public class LoopPatternMatcher {
 	public static String targetPackage(Q cs) {
 		Set<String> targetTypeNames = new HashSet<String>();
 		Set<String> targetPackageNames = new HashSet<String>();
-		for(GraphElement c : cs.eval().nodes()) {
-			Q targetMethods = CallSiteAnalysis.getTargetMethods(c);
+		for(Node c : cs.eval().nodes()) {
+			Q targetMethods = CallSiteAnalysis.getTargets(Common.toQ(c));
 			for(Node t : targetMethods.eval().nodes()) {
 				Node containingNode = Explorer.getContainingNode(t,XCSG.Package);
 				if(containingNode != null) {

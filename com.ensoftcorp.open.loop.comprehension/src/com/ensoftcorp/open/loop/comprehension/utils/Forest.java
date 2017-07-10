@@ -37,7 +37,7 @@ public class Forest<T> {
 	public Tree<T> findTree(String id) {
 		for(Tree<T> tree : trees) {
 			@SuppressWarnings("unchecked")
-			ForestNode<T> node = tree.findNode(tree.getRoot(), (T)id);
+			LCNode<T> node = tree.findNode(tree.getRoot(), (T)id);
 			if(node != null) {
 				return tree;
 			}

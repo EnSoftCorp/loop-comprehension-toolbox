@@ -1,11 +1,9 @@
-/* ==========================================
+package com.ensoftcorp.open.loop.comprehension.utils;
+
+/*
+ * (C) Copyright 2015-2017, by Vera-Licona Research Group and Contributors.
+ *
  * JGraphT : a free Java graph-theory library
- * ==========================================
- *
- * Project Info:  http://jgrapht.sourceforge.net/
- * Project Creator:  Barak Naveh (http://sourceforge.net/users/barak_naveh)
- *
- * (C) Copyright 2003-2012, by Barak Naveh and Contributors.
  *
  * This program and the accompanying materials are dual-licensed under
  * either
@@ -19,9 +17,6 @@
  * (b) the terms of the Eclipse Public License v1.0 as published by
  * the Eclipse Foundation.
  */
-
-package com.ensoftcorp.open.loop.comprehension.utils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
@@ -35,80 +30,89 @@ import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.GraphPath;
-import org.jgrapht.graph.GraphPathImpl;
-
+import org.jgrapht.graph.GraphWalk;
 
 /**
- * A Dijkstra-like algorithm to find all paths between two sets of nodes in a
- * directed graph, with options to search only simple paths and to limit the
- * path length.
+ * A Dijkstra-like algorithm to find all paths between two sets of nodes in a directed graph, with
+ * options to search only simple paths and to limit the path length.
+ *
+ * @param <V> the graph vertex type
+ * @param <E> the graph edge type
  *
  * @author Andrew Gainer-Dewar
  * @since Feb, 2016
  */
-
-public class AllDirectedPaths<V, E>
+public class LimitedDirectedPaths<V, E>
 {
     private final DirectedGraph<V, E> graph;
+    
+    private int maxPaths;
 
-    public AllDirectedPaths(DirectedGraph<V, E> graph)
+    /**
+     * Create a new instance
+     * 
+     * @param graph the input graph
+     */
+    public LimitedDirectedPaths(DirectedGraph<V, E> graph, int maxPaths)
     {
         if (graph == null) {
             throw new IllegalArgumentException("Graph cannot be null!");
         }
 
         this.graph = graph;
+        this.maxPaths = maxPaths;
+    }
+    
+    /**
+     * Limit is Integer.MAX_VALUE
+     * @param graph
+     */
+    public LimitedDirectedPaths(DirectedGraph<V, E> graph)
+    {
+        if (graph == null) {
+            throw new IllegalArgumentException("Graph cannot be null!");
+        }
+
+        this.graph = graph;
+        this.maxPaths = Integer.MAX_VALUE;
     }
 
     /**
-     * Calculate (and return) all paths from the source vertex to the target
-     * vertex.
+     * Calculate (and return) all paths from the source vertex to the target vertex.
      *
      * @param sourceVertex the source vertex
      * @param targetVertex the target vertex
-     * @param simplePathsOnly if true, only search simple
-     * (non-self-intersecting) paths
-     * @param maxPathLength maximum number of edges to allow in a path (if null,
-     * all paths are considered, which may be very slow due to potentially huge
-     * output)
+     * @param simplePathsOnly if true, only search simple (non-self-intersecting) paths
+     * @param maxPathLength maximum number of edges to allow in a path (if null, all paths are
+     *        considered, which may be very slow due to potentially huge output)
+     * @return all paths from the source vertex to the target vertex
      */
     public List<GraphPath<V, E>> getAllPaths(
-        V sourceVertex,
-        V targetVertex,
-        boolean simplePathsOnly,
-        Integer maxPathLength)
+        V sourceVertex, V targetVertex, boolean simplePathsOnly, Integer maxPathLength)
     {
         return getAllPaths(
-            Collections.singleton(sourceVertex),
-            Collections.singleton(targetVertex),
-            simplePathsOnly,
-            maxPathLength);
+            Collections.singleton(sourceVertex), Collections.singleton(targetVertex),
+            simplePathsOnly, maxPathLength);
     }
 
     /**
-     * Calculate (and return) all paths from the source vertices to the target
-     * vertices.
+     * Calculate (and return) all paths from the source vertices to the target vertices.
      *
      * @param sourceVertices the source vertices
      * @param targetVertices the target vertices
-     * @param simplePathsOnly if true, only search simple
-     * (non-self-intersecting) paths
-     * @param maxPathLength maximum number of edges to allow in a path (if null,
-     * all paths are considered, which may be very slow due to potentially huge
-     * output)
+     * @param simplePathsOnly if true, only search simple (non-self-intersecting) paths
+     * @param maxPathLength maximum number of edges to allow in a path (if null, all paths are
+     *        considered, which may be very slow due to potentially huge output)
      *
-     * @return list of all paths from the sources to the targets containing no
-     * more than maxPathLength edges
+     * @return list of all paths from the sources to the targets containing no more than
+     *         maxPathLength edges
      */
     public List<GraphPath<V, E>> getAllPaths(
-        Set<V> sourceVertices,
-        Set<V> targetVertices,
-        boolean simplePathsOnly,
+        Set<V> sourceVertices, Set<V> targetVertices, boolean simplePathsOnly,
         Integer maxPathLength)
     {
         if ((maxPathLength != null) && (maxPathLength < 0)) {
-            throw new IllegalArgumentException(
-                "maxPathLength must be non-negative if defined");
+            throw new IllegalArgumentException("maxPathLength must be non-negative if defined");
         }
 
         if (!simplePathsOnly && (maxPathLength == null)) {
@@ -127,32 +131,25 @@ public class AllDirectedPaths<V, E>
         // Generate all the paths
 
         return generatePaths(
-            sourceVertices,
-            targetVertices,
-            simplePathsOnly,
-            maxPathLength,
+            sourceVertices, targetVertices, simplePathsOnly, maxPathLength,
             edgeMinDistancesFromTargets);
     }
 
     /**
-     * Compute the minimum number of edges in a path to the targets through each
-     * edge, so long as it is not greater than a bound.
+     * Compute the minimum number of edges in a path to the targets through each edge, so long as it
+     * is not greater than a bound.
      *
      * @param targetVertices the target vertices
-     * @param maxPathLength maximum number of edges to allow in a path (if null,
-     * all edges will be considered, which may be expensive)
+     * @param maxPathLength maximum number of edges to allow in a path (if null, all edges will be
+     *        considered, which may be expensive)
      *
-     * @return the minimum number of edges in a path from each edge to the
-     * targets, encoded in a Map
+     * @return the minimum number of edges in a path from each edge to the targets, encoded in a Map
      */
-    private Map<E, Integer> edgeMinDistancesBackwards(
-        Set<V> targetVertices,
-        Integer maxPathLength)
+    private Map<E, Integer> edgeMinDistancesBackwards(Set<V> targetVertices, Integer maxPathLength)
     {
         /*
-         * We walk backwards through the network from the target
-         * vertices, marking edges and vertices with their minimum
-         * distances as we go.
+         * We walk backwards through the network from the target vertices, marking edges and
+         * vertices with their minimum distances as we go.
          */
         Map<E, Integer> edgeMinDistances = new HashMap<>();
         Map<V, Integer> vertexMinDistances = new HashMap<>();
@@ -161,8 +158,7 @@ public class AllDirectedPaths<V, E>
         // Input sanity checking
         if (maxPathLength != null) {
             if (maxPathLength < 0) {
-                throw new IllegalArgumentException(
-                    "maxPathLength must be non-negative if defined");
+                throw new IllegalArgumentException("maxPathLength must be non-negative if defined");
             }
             if (maxPathLength == 0) {
                 return edgeMinDistances;
@@ -198,9 +194,7 @@ public class AllDirectedPaths<V, E>
                 {
                     vertexMinDistances.put(edgeSource, childDistance);
 
-                    if ((maxPathLength == null)
-                        || (childDistance < maxPathLength))
-                    {
+                    if ((maxPathLength == null) || (childDistance < maxPathLength)) {
                         verticesToProcess.add(edgeSource);
                     }
                 }
@@ -212,33 +206,27 @@ public class AllDirectedPaths<V, E>
     }
 
     /**
-     * Generate all paths from the sources to the targets, using pre-computed
-     * minimum distances.
+     * Generate all paths from the sources to the targets, using pre-computed minimum distances.
      *
      * @param sourceVertices the source vertices
      * @param targetVertices the target vertices
      * @param maxPathLength maximum number of edges to allow in a path
-     * @param simplePathsOnly if true, only search simple
-     * (non-self-intersecting) paths (if null, all edges will be considered,
-     * which may be expensive)
-     * @param edgeMinDistancesFromTargets the minimum number of edges in a path
-     * to a target through each edge, as computed by {@code
+     * @param simplePathsOnly if true, only search simple (non-self-intersecting) paths (if null,
+     *        all edges will be considered, which may be expensive)
+     * @param edgeMinDistancesFromTargets the minimum number of edges in a path to a target through
+     *        each edge, as computed by {@code
      * edgeMinDistancesBackwards}.
      *
-     * @return a List of all GraphPaths from the sources to the targets
-     * satisfying the given constraints
+     * @return a List of all GraphPaths from the sources to the targets satisfying the given
+     *         constraints
      */
     private List<GraphPath<V, E>> generatePaths(
-        Set<V> sourceVertices,
-        Set<V> targetVertices,
-        boolean simplePathsOnly,
-        Integer maxPathLength,
-        Map<E, Integer> edgeMinDistancesFromTargets)
+        Set<V> sourceVertices, Set<V> targetVertices, boolean simplePathsOnly,
+        Integer maxPathLength, Map<E, Integer> edgeMinDistancesFromTargets)
     {
         /*
-         * We walk forwards through the network from the source
-         * vertices, exploring all outgoing edges whose minimum
-         * distances is small enough.
+         * We walk forwards through the network from the source vertices, exploring all outgoing
+         * edges whose minimum distances is small enough.
          */
         List<GraphPath<V, E>> completePaths = new ArrayList<>();
         Deque<List<E>> incompletePaths = new LinkedList<>();
@@ -246,8 +234,7 @@ public class AllDirectedPaths<V, E>
         // Input sanity checking
         if (maxPathLength != null) {
             if (maxPathLength < 0) {
-                throw new IllegalArgumentException(
-                    "maxPathLength must be non-negative if defined");
+                throw new IllegalArgumentException("maxPathLength must be non-negative if defined");
             }
             if (maxPathLength == 0) {
                 return completePaths;
@@ -256,8 +243,16 @@ public class AllDirectedPaths<V, E>
 
         // Bootstrap the search with the source vertices
         for (V source : sourceVertices) {
+            if (targetVertices.contains(source)) {
+                completePaths.add(new GraphWalk<>(graph, source, source, new ArrayList<>(), 0));
+            }
+
             for (E edge : graph.outgoingEdgesOf(source)) {
                 assert graph.getEdgeSource(edge).equals(source);
+
+                if (targetVertices.contains(graph.getEdgeTarget(edge))) {
+                    completePaths.add(makePath(Collections.singletonList(edge)));
+                }
 
                 if (edgeMinDistancesFromTargets.containsKey(edge)) {
                     List<E> path = Collections.singletonList(edge);
@@ -267,10 +262,7 @@ public class AllDirectedPaths<V, E>
         }
 
         // Walk through the queue of incomplete paths
-        for (
-            List<E> incompletePath;
-            (incompletePath = incompletePaths.poll()) != null;)
-        {
+        for (List<E> incompletePath; (incompletePath = incompletePaths.poll()) != null;) {
             Integer lengthSoFar = incompletePath.size();
             assert (maxPathLength == null) || (lengthSoFar < maxPathLength);
 
@@ -287,43 +279,35 @@ public class AllDirectedPaths<V, E>
                 // Proceed if the outgoing edge is marked and the mark
                 // is sufficiently small
                 if (edgeMinDistancesFromTargets.containsKey(outEdge)
-                    && ((maxPathLength == null)
-                        || ((edgeMinDistancesFromTargets.get(outEdge)
-                                + lengthSoFar) <= maxPathLength)))
+                    && ((maxPathLength == null) || ((edgeMinDistancesFromTargets.get(outEdge)
+                        + lengthSoFar) <= maxPathLength)))
                 {
                     List<E> newPath = new ArrayList<>(incompletePath);
                     newPath.add(outEdge);
 
                     // If requested, make sure this path isn't self-intersecting
-                    if (simplePathsOnly
-                        && pathVertices.contains(
-                            graph.getEdgeTarget(outEdge)))
-                    {
+                    if (simplePathsOnly && pathVertices.contains(graph.getEdgeTarget(outEdge))) {
                         continue;
                     }
 
                     // If this path reaches a target, add it to completePaths
                     if (targetVertices.contains(graph.getEdgeTarget(outEdge))) {
                         GraphPath<V, E> completePath = makePath(newPath);
-                        assert sourceVertices.contains(
-                            completePath.getStartVertex());
-                        assert targetVertices.contains(
-                            completePath.getEndVertex());
+                        assert sourceVertices.contains(completePath.getStartVertex());
+                        assert targetVertices.contains(completePath.getEndVertex());
                         assert (maxPathLength == null)
                             || (completePath.getWeight() <= maxPathLength);
                         completePaths.add(completePath);
                         
-                        // Quit path finding when number of paths explored > 500 
-                        if(completePaths.size() >= 500) {
+                        // quit path finding when number of paths explored >= maxPaths 
+                        if(completePaths.size() >= maxPaths) {
                         	return completePaths;
                         }
                     }
 
                     // If this path is short enough, consider further
                     // extensions of it
-                    if ((maxPathLength == null)
-                        || (newPath.size() < maxPathLength))
-                    {
+                    if ((maxPathLength == null) || (newPath.size() < maxPathLength)) {
                         incompletePaths.addFirst(newPath); // We use
                                                            // incompletePaths in
                                                            // FIFO mode to avoid
@@ -349,7 +333,8 @@ public class AllDirectedPaths<V, E>
         V source = graph.getEdgeSource(edges.get(0));
         V target = graph.getEdgeTarget(edges.get(edges.size() - 1));
         double weight = edges.size();
-        return new GraphPathImpl<>(graph, source, target, edges, weight);
+        return new GraphWalk<>(graph, source, target, edges, weight);
     }
 }
 
+// End AllDirectedPaths.java

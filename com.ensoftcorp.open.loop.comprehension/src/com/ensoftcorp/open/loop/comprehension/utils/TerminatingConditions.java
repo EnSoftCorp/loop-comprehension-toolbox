@@ -2,15 +2,14 @@ package com.ensoftcorp.open.loop.comprehension.utils;
 
 import static com.ensoftcorp.atlas.core.script.Common.toGraph;
 import static com.ensoftcorp.atlas.core.script.Common.toQ;
+
 import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.query.Query;
-import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
-import com.ensoftcorp.open.commons.analysis.StandardQueries;
 import com.ensoftcorp.open.jimple.commons.loops.DecompiledLoopIdentification.CFGNode;
-import com.ensoftcorp.open.pcg.factory.PCGFactory;
+import com.ensoftcorp.open.pcg.common.PCGFactory;
 
 public class TerminatingConditions {
 	
@@ -41,10 +40,9 @@ public class TerminatingConditions {
 			return Query.empty();
 		}
 		
-		Q method = Common.toQ(StandardQueries.getContainingFunction(geLoopHeader));
-		Q PCG = PCGFactory.PCGforMethod(method, loopHeader);
+		Q pcg = PCGFactory.create(loopHeader).getPCG();
 		
-		Q allConditions = PCG.nodesTaggedWithAll(XCSG.ControlFlowCondition);
+		Q allConditions = pcg.nodesTaggedWithAll(XCSG.ControlFlowCondition);
 		
 		Object loopHeaderId = geLoopHeader.getAttr(CFGNode.LOOP_HEADER_ID);
 		

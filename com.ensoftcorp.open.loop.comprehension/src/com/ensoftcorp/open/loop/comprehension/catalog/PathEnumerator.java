@@ -7,7 +7,6 @@ import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.GraphPath;
-import org.jgrapht.Graphs;
 import org.jgrapht.graph.DirectedPseudograph;
 
 import com.ensoftcorp.atlas.core.db.graph.Edge;
@@ -18,9 +17,8 @@ import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
 import com.ensoftcorp.atlas.java.core.script.Common;
-import com.ensoftcorp.open.commons.analysis.CFG;
-import com.ensoftcorp.open.commons.analysis.StandardQueries;
-import com.ensoftcorp.open.loop.comprehension.utils.AllDirectedPaths;
+import com.ensoftcorp.open.commons.analysis.CommonQueries;
+import com.ensoftcorp.open.loop.comprehension.utils.LimitedDirectedPaths;
 
 public class PathEnumerator {
 
@@ -64,7 +62,7 @@ public class PathEnumerator {
 	public static List<List<GraphElement>> pathsInMethod(Q aSelectedMethod) {
 		System.out.println(aSelectedMethod.eval().nodes().getFirst().getAttr(XCSG.name));
 		paths = new ArrayList<List<GraphElement>>();
-		Q methodCFG = CFG.cfg(aSelectedMethod);
+		Q methodCFG = CommonQueries.cfg(aSelectedMethod);
 		
 		// walk all paths in the method from its control flow entry point  
 		return pathsInCFG(methodCFG);
@@ -200,7 +198,7 @@ public class PathEnumerator {
 
 		// add the new re-entry node to the method via XCSG.Contains, 
 		// so it is in the method scope
-		GraphElement newContainsEdge = Graph.U.createEdge(StandardQueries.getContainingFunction(loopHeader), newReentryNode);
+		GraphElement newContainsEdge = Graph.U.createEdge(CommonQueries.getContainingFunction(loopHeader), newReentryNode);
 		newContainsEdge.tag(XCSG.Contains);
 		newEdges.add(newContainsEdge);
 
@@ -355,7 +353,7 @@ public class PathEnumerator {
 	 * @return
 	 */
 	public static List<List<Node>> getLoopPaths(Node loopHeader) {
-		Q method = Common.toQ(StandardQueries.getContainingFunction(loopHeader));
+		Q method = Common.toQ(CommonQueries.getContainingFunction(loopHeader));
 		
 		AtlasSet<Node> loopReentryNodes = getLoopReentryNodes(loopHeader).eval().nodes();
 		
@@ -368,16 +366,17 @@ public class PathEnumerator {
 		}
 		targets.add(loopHeader);
 		
-		Q cfgMethod = CFG.cfg(method);
+		Q cfgMethod = CommonQueries.cfg(method);
 		Q pathsForBC = cfgMethod.between(Common.toQ(loopHeader), Common.toQ(loopReentryNodes));
 		
 		DirectedGraph<Node, Edge> jg = getJgraphTDirectedGraph(pathsForBC);
-		AllDirectedPaths<Node, Edge> adp = new AllDirectedPaths<Node, Edge>(jg);
+		int maxPaths = 500; // limit to 500 paths
+		LimitedDirectedPaths<Node, Edge> adp = new LimitedDirectedPaths<Node, Edge>(jg, maxPaths);
 		List<GraphPath<Node,Edge>> pathsInLoop = adp.getAllPaths(sources, targets, true, null);
 	
 		List<List<Node>> paths = new ArrayList<List<Node>>();
 		for(GraphPath<Node, Edge> gp : pathsInLoop) {
-			List<Node> p = Graphs.getPathVertexList(gp);
+			List<Node> p = gp.getVertexList();
 			paths.add(p);
 			printPath(p);
 		}

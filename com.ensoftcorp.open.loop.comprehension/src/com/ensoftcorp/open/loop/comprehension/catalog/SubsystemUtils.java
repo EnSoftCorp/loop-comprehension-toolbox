@@ -1,6 +1,6 @@
 package com.ensoftcorp.open.loop.comprehension.catalog;
 
-import com.ensoftcorp.atlas.core.db.graph.GraphElement;
+import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
@@ -9,7 +9,7 @@ import com.ensoftcorp.open.java.commons.analysis.CallSiteAnalysis;
 import com.ensoftcorp.open.loop.comprehension.utils.JDKContainer;
 
 /**
- * This is the place to add any subsystem related utilities
+ * Subsystem related utilities
  * 
  * @author Payas Awadhutkar
  */
@@ -20,11 +20,11 @@ public class SubsystemUtils {
 		
 		Q jdkCallSites = Common.empty();
 		
-		for (GraphElement callsite : statementsWithCallsites.eval().nodes()) {
+		for (Node callsite : statementsWithCallsites.eval().nodes()) {
 //			Log.info(callsite.toString());
 			Q dfCallsites = Common.toQ(callsite).contained().nodesTaggedWithAll(XCSG.CallSite);
-			for(GraphElement dfcs : dfCallsites.eval().nodes()) { 
-				Q targetMethods = CallSiteAnalysis.getTargetMethods(dfcs);
+			for(Node dfcs : dfCallsites.eval().nodes()) { 
+				Q targetMethods = Common.toQ(CallSiteAnalysis.getTargetMethods(dfcs));
 //				Log.info(targetMethods.eval().nodes().size()+"");
 				AtlasSet<com.ensoftcorp.atlas.core.db.graph.Node> nonJDKtargets = targetMethods.difference(jdkMethods).eval().nodes();
 //				Log.info(nonJDKtargets.size()+"");
@@ -75,10 +75,10 @@ public class SubsystemUtils {
 		
 		Q jdkAPIsCalled = Common.empty();
 		
-		for (GraphElement statement : statementsWithCallsites.eval().nodes()) {
+		for (Node statement : statementsWithCallsites.eval().nodes()) {
 			Q dfCallsites = Common.toQ(statement).contained().nodesTaggedWithAll(XCSG.CallSite);
-			for(GraphElement dfcs : dfCallsites.eval().nodes()) { 
-				Q targetMethods = CallSiteAnalysis.getTargetMethods(dfcs);
+			for(Node dfcs : dfCallsites.eval().nodes()) { 
+				Q targetMethods = Common.toQ(CallSiteAnalysis.getTargetMethods(dfcs));
 				
 				// get the descendants of the target methods on the call graph
 				Q deepTargetMethods = callEdges.forward(targetMethods).nodesTaggedWithAny(XCSG.Method);

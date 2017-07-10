@@ -2,18 +2,18 @@ package com.ensoftcorp.open.loop.comprehension.utils;
 
 import java.util.Collection;
 
-import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.query.Q;
-import com.ensoftcorp.atlas.core.script.CommonQueries;
+import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
-import com.ensoftcorp.open.java.commons.analysis.CallSiteAnalysis;
-import com.ensoftcorp.open.loop.comprehension.log.Log;
+import com.ensoftcorp.open.commons.analysis.CallSiteAnalysis;
+import com.ensoftcorp.open.commons.analysis.CommonQueries;
+import com.ensoftcorp.open.jimple.commons.analysis.SetDefinitions;
 
 /**
  * Matches signature strings with the ##signature tag on data flow callsite node
  * Evaluates targets of the callsite and finds targets in JDK and those outside of JDK
- * @author gsanthan
+ * @author Payas Awadhutkar, Ganesh Ram Santhanam
  *
  */
 public class MethodSignatureMatcher {
@@ -32,10 +32,13 @@ public class MethodSignatureMatcher {
 		}
 		// ge matches the signature
 //		return CallSite.getTargetMethods(callsite).eval().nodes().one().getAttr("##signature").equals(signature);
-		Node target = CallSiteAnalysis.getTargetMethods(callsite).eval().nodes().one();
+		Node target = CallSiteAnalysis.getTargets(callsite).one(); // TODO: there could be more than one!
 		if(target == null || target.getAttr("##signature") == null) {
 			if(target != null) {
-				Log.info("null " + target.address().toAddressString());
+				
+				// this is really noisy, my logs are screaming at me...also why are we only using one of the getTargetMethods? ~BH
+				
+//				Log.info("null " + target.address().toAddressString());
 			}
 			return false;
 		}
@@ -87,13 +90,13 @@ public class MethodSignatureMatcher {
 	 * @param callsite data flow node 
 	 * @return
 	 */
-	public static Q getTargetsWithinJDK(GraphElement callsite) {
+	public static Q getTargetsWithinJDK(Node callsite) {
 
 		if(!callsite.taggedWith(XCSG.CallSite)) {
 			throw new RuntimeException("Expected a callsite as argument");
 		}
 		
-		return CallSiteAnalysis.getTargetMethods(callsite).intersection(JDKContainer.jdkMethods());
+		return Common.toQ(CallSiteAnalysis.getTargets(callsite)).intersection(SetDefinitions.JDKLibraries().nodes(XCSG.Method));
 	}
 	
 	/**
@@ -102,7 +105,7 @@ public class MethodSignatureMatcher {
 	 * @param callsite data flow node 
 	 * @return
 	 */
-	public static boolean hasTargetsWithinJDK(GraphElement callsite) {
+	public static boolean hasTargetsWithinJDK(Node callsite) {
 
 		return !CommonQueries.isEmpty(getTargetsWithinJDK(callsite));
 	}
@@ -113,13 +116,13 @@ public class MethodSignatureMatcher {
 	 * @param callsite data flow node 
 	 * @return
 	 */
-	public static Q getTargetsOutsideJDK(GraphElement callsite) {
+	public static Q getTargetsOutsideJDK(Node callsite) {
 
 		if(!callsite.taggedWith(XCSG.CallSite)) {
 			throw new RuntimeException("Expected a callsite as argument");
 		}
 		
-		return CallSiteAnalysis.getTargetMethods(callsite).difference(JDKContainer.jdkMethods());
+		return Common.toQ(CallSiteAnalysis.getTargets(callsite)).difference(SetDefinitions.JDKLibraries().nodes(XCSG.Method));
 	}
 	
 	/**
@@ -129,7 +132,7 @@ public class MethodSignatureMatcher {
 	 * @return
 	 */
 
-	public static boolean hasTargetsOutsideJDK(GraphElement callsite) {
+	public static boolean hasTargetsOutsideJDK(Node callsite) {
 
 		return !CommonQueries.isEmpty(getTargetsOutsideJDK(callsite));
 	}

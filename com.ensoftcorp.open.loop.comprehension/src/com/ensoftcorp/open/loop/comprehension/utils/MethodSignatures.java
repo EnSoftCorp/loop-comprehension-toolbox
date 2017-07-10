@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * List of String method signatures, to be used with MethodSignatureMatcher
  * 
- * @author gsanthan
+ * @author Payas Awadhutkar, Ganesh Ram Santhanam
  *
  */
 public interface MethodSignatures {

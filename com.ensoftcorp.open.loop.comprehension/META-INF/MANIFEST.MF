@@ -9,7 +9,8 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.debug.ui,
  com.ensoftcorp.atlas.ui,
- com.ensoftcorp.open.java.commons;bundle-version="3.0.14",
- com.ensoftcorp.open.jimple.commons;bundle-version="3.0.14",
- com.ensoftcorp.open.pcg;bundle-version="3.0.14",
- org.jgrapht;bundle-version="0.9.1"
+ com.ensoftcorp.open.java.commons;bundle-version="3.1.0",
+ com.ensoftcorp.open.jimple.commons;bundle-version="3.1.0",
+ com.ensoftcorp.open.pcg;bundle-version="3.1.0",
+ org.jgrapht;bundle-version="0.9.1",
+ com.ensoftcorp.abp.common;bundle-version="3.1.3"

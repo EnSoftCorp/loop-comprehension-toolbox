@@ -1,8 +1,6 @@
 package com.ensoftcorp.open.loop.comprehension.utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.jgrapht.graph.DefaultEdge;
@@ -12,14 +10,20 @@ import com.ensoftcorp.atlas.core.db.graph.GraphElement;
 import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.db.set.AtlasHashSet;
 import com.ensoftcorp.atlas.core.db.set.AtlasSet;
+import com.ensoftcorp.atlas.core.query.Attr;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.script.Common;
-import com.ensoftcorp.atlas.core.script.CommonQueries;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
-import com.ensoftcorp.open.commons.analysis.StandardQueries;
+import com.ensoftcorp.open.commons.analysis.CallSiteAnalysis;
+import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.commons.subsystems.Subsystems;
-import com.ensoftcorp.open.java.commons.analysis.CallSiteAnalysis;
 import com.ensoftcorp.open.jimple.commons.loops.DecompiledLoopIdentification.CFGNode;
+
+/**
+ * Utilities required for loop characterization
+ * 
+ * @author Payas Awadhutkar, Ganesh Ram Santhanam
+ */
 
 public class LoopUtils {
 
@@ -40,7 +44,7 @@ public class LoopUtils {
 		Q subsystemMethods = Subsystems.getSubsystemContents(subsystemTags).nodesTaggedWithAny(XCSG.Method);
 		result = Common.edges(XCSG.Call).between(targetMethodsFromLoop,subsystemMethods);
 		Q callsiteContainers = getCallsitesInsideLoop(loopHeader).parent();
-		Q summaryCallEdges = Common.edges("summary.call").betweenStep(callsiteContainers, result);
+		Q summaryCallEdges = Common.edges(Attr.Edge.PER_CONTROL_FLOW).betweenStep(callsiteContainers, result);
 		result = result.union(summaryCallEdges);
 		return result;
 	}
@@ -52,9 +56,9 @@ public class LoopUtils {
 		Q subsystemMethods = methodSet.nodesTaggedWithAny(XCSG.Method);
 		result = Common.edges(XCSG.Call).between(targetMethodsFromLoop,subsystemMethods);
 		Q callsiteContainers = getCallsitesInsideLoop(loopHeader).parent();
-		Q summaryCallEdges = Common.edges("summary.call").betweenStep(callsiteContainers, result);
+		Q summaryCallEdges = Common.edges(Attr.Edge.PER_CONTROL_FLOW).betweenStep(callsiteContainers, result);
 		result = result.union(summaryCallEdges);
-		result = result.union(getControlFlowMembers(loopHeader).nodesTaggedWithAny(XCSG.ControlFlow_Node)).induce(Common.edges(XCSG.ControlFlow_Edge));
+		result = result.union(getControlFlowGraph(loopHeader));
 		
 //		show(LoopCallSiteStats.getMethodSetInteractions(l,stackMethods).union(LoopCallSiteStats.getControlFlowMembers(l).nodesTaggedWithAny(XCSG.ControlFlow_Node)).induce(edges(XCSG.ControlFlow_Edge)))
 
@@ -64,8 +68,8 @@ public class LoopUtils {
 	public static Q getTargetMethodsFromLoop(Q loopHeader) {
 		Q cs = getCallsitesInsideLoop(loopHeader);
 		Q targetMethodsFromLoop = Common.empty();
-		for(GraphElement c : cs.eval().nodes()) {
-			targetMethodsFromLoop = targetMethodsFromLoop.union(CallSiteAnalysis.getTargetMethods(c));
+		for(Node c : cs.eval().nodes()) {
+			targetMethodsFromLoop = targetMethodsFromLoop.union(CallSiteAnalysis.getTargets(Common.toQ(c)));
 		}
 		return targetMethodsFromLoop;
 	}
@@ -131,11 +135,11 @@ public class LoopUtils {
 			return Common.empty();
 		} 
 
-		AtlasSet<GraphElement> cfgCallsites = new AtlasHashSet<GraphElement>();
+		AtlasSet<Node> cfgCallsites = new AtlasHashSet<Node>();
 		
-		for (GraphElement dfCallsite : dfCallsites) {
+		for (Node dfCallsite : dfCallsites) {
 
-			Q targetMethods = CallSiteAnalysis.getTargetMethods(dfCallsite);
+			Q targetMethods = CallSiteAnalysis.getTargets(Common.toQ(dfCallsite));
 			
 			if (!targetMethods.eval().nodes().isEmpty()) {
 				// NOTE: the parent of a CallSite is always a ControlFlow_Node
@@ -150,17 +154,17 @@ public class LoopUtils {
 	public static Q getControlFlowMembers(Q loopHeaders){
 		AtlasSet<com.ensoftcorp.atlas.core.db.graph.Node> loopBodyMembers = new AtlasHashSet<com.ensoftcorp.atlas.core.db.graph.Node>();
 		for(com.ensoftcorp.atlas.core.db.graph.Node loopHeader : loopHeaders.eval().nodes()){
-			loopBodyMembers.addAll(getControlFlowMembers(loopHeader).contained().eval().nodes());
+			loopBodyMembers.addAll(Common.edges(XCSG.ControlFlow_Edge).between(Common.toQ(loopHeader), Common.toQ(loopHeader)).contained().eval().nodes());
 		}
 		return Common.toQ(loopBodyMembers);
 	}
 	
-	public static Q getControlFlowGraph(Q loopHeaders){
+	public static Q getControlFlowGraph(Q loopHeaders) {
 		Q cfEdges = Common.edges(XCSG.ControlFlow_Edge);
 		return getControlFlowMembers(loopHeaders).nodesTaggedWithAny(XCSG.ControlFlow_Node).induce(cfEdges);
 	}
 	
-	public static Q getControlFlowMembers(com.ensoftcorp.atlas.core.db.graph.Node loopHeader) {
+	/*public static Q getControlFlowMembers(com.ensoftcorp.atlas.core.db.graph.Node loopHeader) {
 		Q result = Common.empty();
 		Q u = Common.universe();
 		Q cfNodes = u.nodesTaggedWithAny(XCSG.ControlFlow_Node);
@@ -177,37 +181,43 @@ public class LoopUtils {
 		}
 		
 		return result.induce(cfEdges);
+	}*/
+	
+	public static Q getControlFlowMembers(com.ensoftcorp.atlas.core.db.graph.Node loopHeader) {
+		return Common.edges(XCSG.ControlFlow_Edge).between(Common.toQ(loopHeader), Common.toQ(loopHeader));
 	}
+	
 	
 	public static Q getControlFlowGraph(com.ensoftcorp.atlas.core.db.graph.Node loopHeader) {
-		Q cfMembers = getControlFlowMembers(loopHeader);
-		Q cfEdges = Common.edges(XCSG.ControlFlow_Edge);
-		return cfMembers.nodesTaggedWithAny(XCSG.ControlFlow_Node).induce(cfEdges);
+//		Q cfMembers = getControlFlowMembers(loopHeader);
+//		Q cfEdges = Common.edges(XCSG.ControlFlow_Edge);
+//		return cfMembers.nodesTaggedWithAny(XCSG.ControlFlow_Node).induce(cfEdges);
+		return Common.edges(XCSG.ControlFlow_Edge).between(Common.toQ(loopHeader), Common.toQ(loopHeader));
 	}
 	
-	public static List<String> getLoopsNestedUnder(com.ensoftcorp.atlas.core.db.graph.Node loopHeader) {
+/*	public static List<String> getLoopsNestedUnder(com.ensoftcorp.atlas.core.db.graph.Node loopHeader) {
 		List<String> descendants = new ArrayList<String>();
 		String headerId = loopHeader.getAttr(CFGNode.LOOP_HEADER_ID).toString();
-		Forest<String> forest = buildLoopHierarchy(StandardQueries.getContainingFunction(loopHeader));
+		Forest<String> forest = buildLoopHierarchy(CommonQueries.getContainingFunction(loopHeader));
 		Tree<String> treeNode = forest.findTree(headerId);
 		if(treeNode == null || treeNode.isEmpty()) {
 			throw new RuntimeException("Loop " + headerId + " not in the hierarchy");
 		}
-		ForestNode<String> rootNode = treeNode.getRoot();
-		ForestNode<String> loopNode = treeNode.findNode(rootNode, headerId);
+		RULERNode<String> rootNode = treeNode.getRoot();
+		RULERNode<String> loopNode = treeNode.findNode(rootNode, headerId);
 		if(loopNode == null) {
 			throw new RuntimeException("Loop " + headerId + " not in the tree rooted at "+rootNode.getData());
 		}
-		List<ForestNode<String>> desc = loopNode.getDescendants();
-		for(ForestNode<String> node : desc) {
+		List<RULERNode<String>> desc = loopNode.getDescendants();
+		for(RULERNode<String> node : desc) {
 			descendants.add(node.getData());
 		}
 		return descendants;
-	}
+	}*/
 
 	public static Forest<String> buildLoopHierarchy(GraphElement method) {
 		Q cfNodes = Common.toQ(method).contained().nodesTaggedWithAny(XCSG.ControlFlow_Node);
-		Map<String, ForestNode<String>> loopMap = new HashMap<String, ForestNode<String>>();
+		Map<String, LCNode<String>> loopMap = new HashMap<String, LCNode<String>>();
 		Forest<String> forest = new Forest<String>(); 
 		
 		// create JGraphT graph as well
@@ -218,7 +228,7 @@ public class LoopUtils {
 		Q loopHeaders = cfNodes.nodesTaggedWithAny(CFGNode.LOOP_HEADER);
 		for(GraphElement l : loopHeaders.eval().nodes()) {
 			String headerId = l.getAttr(CFGNode.LOOP_HEADER_ID).toString();
-			ForestNode<String> loop = new ForestNode<String>(headerId);
+			LCNode<String> loop = new LCNode<String>(headerId);
 			loopMap.put(headerId, loop);
 			
 			// add jgrapht node
@@ -231,7 +241,7 @@ public class LoopUtils {
 			String headerId = l.getAttr(CFGNode.LOOP_HEADER_ID).toString();
 			
 			// look up the node created for this loop 
-			ForestNode<String> loop = loopMap.get(headerId);
+			LCNode<String> loop = loopMap.get(headerId);
 			
 			if(l.hasAttr(CFGNode.LOOP_MEMBER_ID)) {
 				// if loop is a member of another loop, enforce the parent-child relationship
@@ -241,7 +251,7 @@ public class LoopUtils {
 				}
 				
 				// look up node for the loop the current loop header is a member of
-				ForestNode<String> parent = loopMap.get(memberOf);
+				LCNode<String> parent = loopMap.get(memberOf);
 				
 				parent.addChild(loop);
 				
