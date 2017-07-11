@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Loop Comprehension Toolbox
 Bundle-SymbolicName: com.ensoftcorp.open.loop.comprehension;singleton:=true
-Bundle-Version: 3.0.14.qualifier
+Bundle-Version: 3.1.0.qualifier
 Bundle-Activator: com.ensoftcorp.open.loop.comprehension.Activator
 Bundle-Vendor: Ensoft Corp.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
@@ -12,5 +12,5 @@ Require-Bundle: org.eclipse.debug.ui,
  com.ensoftcorp.open.java.commons;bundle-version="3.1.0",
  com.ensoftcorp.open.jimple.commons;bundle-version="3.1.0",
  com.ensoftcorp.open.pcg;bundle-version="3.1.0",
- org.jgrapht;bundle-version="0.9.1",
+ org.jgrapht;bundle-version="1.0.1",
  com.ensoftcorp.abp.common;bundle-version="3.1.3"
