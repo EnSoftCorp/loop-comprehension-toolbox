@@ -1,2 +1,2 @@
 # loop-comprehension-toolbox
-A catalog semantic loop patterns
+A suite of tools to reason about loops.
