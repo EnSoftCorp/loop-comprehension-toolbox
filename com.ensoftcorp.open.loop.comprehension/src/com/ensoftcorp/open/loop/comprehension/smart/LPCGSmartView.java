@@ -42,7 +42,7 @@ public class LPCGSmartView extends AbstractAtlasSmartViewScript implements Atlas
 
 		@Override
 		public String getTitle() {
-			return "RULER Loop Termination PCG";
+			return "Loop Projected Control Flow Graph (LPCG)";
 		}
 
 		@Override
