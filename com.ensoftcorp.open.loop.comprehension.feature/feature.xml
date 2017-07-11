@@ -2,7 +2,7 @@
 <feature
       id="com.ensoftcorp.open.loop.comprehension.feature"
       label="Feature"
-      version="1.0.0.qualifier"
+      version="3.1.0.qualifier"
       provider-name="ENSOFTCORP">
 
    <description url="http://www.example.com/description">
