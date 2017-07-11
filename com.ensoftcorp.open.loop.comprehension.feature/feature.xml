@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="com.ensoftcorp.open.loop.comprehension.feature"
-      label="Feature"
+      label="Loop Comprehension Toolbox"
       version="3.1.0.qualifier"
       provider-name="ENSOFTCORP">
 
