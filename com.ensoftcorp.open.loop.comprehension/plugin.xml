@@ -4,103 +4,103 @@
 
 	<!-- adds filter definitions -->
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.LocalPrimitiveLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.LocalPrimitiveLoopPatternFilter"></filter>
    </extension>
 
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.LocalArrayLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.LocalArrayLoopPatternFilter"></filter>
    </extension>
 
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.LocalCollectionLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.LocalCollectionLoopPatternFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.FieldPrimitiveLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.FieldPrimitiveLoopPatternFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.FieldArrayLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.FieldArrayLoopPatternFilter"></filter>
    </extension>
 
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.FieldCollectionLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.FieldCollectionLoopPatternFilter"></filter>
    </extension>
 
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.ParameterPrimitiveLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.ParameterPrimitiveLoopPatternFilter"></filter>
    </extension>
 
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.ParameterArrayLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.ParameterArrayLoopPatternFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.ParameterCollectionLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.ParameterCollectionLoopPatternFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.CallsitePrimitiveLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.CallsitePrimitiveLoopPatternFilter"></filter>
    </extension>
 
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.CallsiteArrayLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.CallsiteArrayLoopPatternFilter"></filter>
    </extension>
 
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.CallsiteCollectionLoopPatternFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.CallsiteCollectionLoopPatternFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.LoopSubsystemInteractionFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.LoopSubsystemInteractionFilter"></filter>
    </extension>
 
    <extension point="com.ensoftcorp.open.commons.subsystem">
-      <subsystem class="org.rulersoftware.loop.catalog.subsystems.IteratorSubsystem"></subsystem>
+      <subsystem class="com.ensoftcorp.open.loop.comprehension.subsystems.IteratorSubsystem"></subsystem>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.subsystem">
-      <subsystem class="org.rulersoftware.loop.catalog.subsystems.CollectionSubsystem"></subsystem>
+      <subsystem class="com.ensoftcorp.open.loop.comprehension.subsystems.CollectionSubsystem"></subsystem>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.IOFieldFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.IOFieldFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.IOLocalFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.IOLocalFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.IOParameterFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.IOParameterFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.APIFieldFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.APIFieldFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.APILocalFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.APILocalFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.APIParameterFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.APIParameterFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.UnknownCallsiteFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.UnknownCallsiteFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.MonotonicityFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.MonotonicityFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.DifferentialBranchFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.DifferentialBranchFilter"></filter>
    </extension>
    
    <extension point="com.ensoftcorp.open.commons.filter">
-      <filter class="org.rulersoftware.loop.catalog.filters.ReachabilityFilter"></filter>
+      <filter class="com.ensoftcorp.open.loop.comprehension.filters.ReachabilityFilter"></filter>
    </extension>
 
 	<!-- adds the smart views -->
