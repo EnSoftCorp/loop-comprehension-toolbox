@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
    <feature url="features/com.ensoftcorp.open.loop.comprehension.feature_3.1.0.201707111605.jar" id="com.ensoftcorp.open.loop.comprehension.feature" version="3.1.0.201707111605"/>
+   <category-def name="com.ensoftcorp.open.loop.comprehension.category" label="Loop Comprehension Toolbox">
+      <description>
+         A suite of tools to reason about loops.
+      </description>
+</category-def>
 </site>
