@@ -8,7 +8,7 @@ The Loop Comprehension Toolbox provides a suite of tools to reason about loops. 
 ## Features
 The Loop Comprehension Toolbox project supports the following.
 
-- Characterization of loops in an app.(Java source/Java Bytecode). We use following attributes to characterize loops.
+- Characterization of loops in an app (Java source/Java Bytecode). We use following attributes to characterize loops.
 <center><img src="./images/loop-attributes.png" alt="Loop Attributes used for Characterization" /></center>
 - Following characterizations are supported (see tutorial for more details)
   - Loop Monotonicity
