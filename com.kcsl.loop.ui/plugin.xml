@@ -44,9 +44,9 @@
         
         <view
             category="com.ensoftcorp.open.commons.views.categories.toolbox"
-            class="org.rulersoftware.ui.LoopCatalogView"
+            class="com.kcsl.loop.ui.LoopCatalogView"
             icon="icons/toolbox.gif"
-            id="org.rulersoftware.ui.loopCatalogView"
+            id="com.kcsl.loop.ui.loopCatalogView"
             name="Loop Catalog View">
       	</view>
    
