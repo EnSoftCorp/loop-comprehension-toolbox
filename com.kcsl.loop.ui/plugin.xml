@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+	<!-- Smart views -->
+	<extension
+         point="com.ensoftcorp.atlas.ui.smartViewScript">
+      
+      <script
+            class="com.kcsl.loop.ui.smart.LoopTerminationPCG">
+      </script>
+
+      <script
+            class="com.kcsl.loop.ui.smart.LoopTerminatingConditions">
+      </script>
+      
+      <script
+            class="com.kcsl.loop.ui.smart.LoopTerminationSliceTaintView">
+      </script>
+      <script
+            class="com.kcsl.loop.ui.smart.SubsystemInteractionsView">
+      </script>
+      <script
+            class="com.kcsl.loop.ui.smart.SubsystemInteractionsPCGView">
+      </script>
+      <script
+            class="com.kcsl.loop.ui.smart.LoopNestingView">
+      </script>
+      <script
+      		class="com.kcsl.loop.ui.smart.LoopReachabilityFromDataFlow">
+      </script>
+      <script
+      		class="com.kcsl.loop.ui.smart.LoopReachabilityToDataFlow">
+      </script>
+      
+      <script
+      		class="com.kcsl.loop.ui.smart.LoopBodyView">
+      </script>
+
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.views">
+        
+        <view
+            category="com.ensoftcorp.open.commons.views.categories.toolbox"
+            class="org.rulersoftware.ui.LoopCatalogView"
+            icon="icons/toolbox.gif"
+            id="org.rulersoftware.ui.loopCatalogView"
+            name="Loop Catalog View">
+      	</view>
+   
+   </extension>
+      	
+</plugin>

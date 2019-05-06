@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Taint
+Bundle-SymbolicName: com.kcsl.loop.taint;singleton:=true
+Bundle-Version: 3.3.8.qualifier
+Bundle-Activator: com.kcsl.loop.taint.Activator
+Bundle-Vendor: KCSL
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ com.kcsl.loop;bundle-version="3.3.8",
+ com.kcsl.loop.lcg;bundle-version="3.3.8",
+ net.ontopia.utils;bundle-version="5.2.2"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: com.kcsl.loop.taint
+Bundle-ActivationPolicy: lazy
+Export-Package: com.kcsl.loop.taint.analysis,
+ com.kcsl.loop.taint.highlighter
