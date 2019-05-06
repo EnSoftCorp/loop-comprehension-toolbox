@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	
+   <!-- create an initializer extension to initialize preferences -->
+   <extension
+      point="org.eclipse.equinox.preferences.preferences">
+	   <initializer
+	         class="com.kcsl.loop.preferences.LoopPreferences">
+	   </initializer>
+	</extension>
+   
+   <!-- create a preferences page item for the toolbox -->
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.kcsl.loop.preferences.ui.LoopPreferencesPage"
+            id="org.rulersoftware.preferences.ui.preferences"
+            name="Loop Comprehension Toolbox"
+            category="com.ensoftcorp.open.commons.ui.toolbox.preferences">
+      </page>
+   </extension>
+	
+</plugin>
