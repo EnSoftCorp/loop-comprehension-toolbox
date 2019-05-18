@@ -44,14 +44,14 @@ SOFTWARE.
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="com.ensoftcorp.open.commons" version="3.3.7" match="greaterOrEqual"/>
-      <import plugin="com.ensoftcorp.open.jimple.commons" version="3.3.7" match="greaterOrEqual"/>
-      <import plugin="com.ensoftcorp.open.java.commons" version="3.3.7" match="greaterOrEqual"/>
+      <import plugin="com.ensoftcorp.open.commons" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="com.ensoftcorp.open.jimple.commons" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="com.ensoftcorp.open.java.commons" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="com.kcsl.loop.preferences" version="3.3.8" match="greaterOrEqual"/>
       <import plugin="org.jgrapht" version="1.0.1" match="greaterOrEqual"/>
       <import plugin="com.ensoftcorp.abp.common" version="3.3.8" match="greaterOrEqual"/>
       <import plugin="com.kcsl.loop" version="3.3.8" match="greaterOrEqual"/>
-      <import plugin="com.ensoftcorp.open.pcg" version="3.3.7" match="greaterOrEqual"/>
+      <import plugin="com.ensoftcorp.open.pcg" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="com.kcsl.loop.taint" version="3.3.8" match="greaterOrEqual"/>
       <import plugin="com.kcsl.loop.lcg" version="3.3.8" match="greaterOrEqual"/>
       <import plugin="com.kcsl.loop.catalog" version="3.3.8" match="greaterOrEqual"/>
@@ -59,7 +59,7 @@ SOFTWARE.
       <import plugin="com.kcsl.loop.codemap" version="3.3.8" match="greaterOrEqual"/>
       <import plugin="com.fasterxml.jackson.core" version="2.9.2" match="greaterOrEqual"/>
       <import plugin="com.fasterxml.jackson.databind" version="2.9.2" match="greaterOrEqual"/>
-      <import plugin="com.kcsl.sidis" version="3.3.7" match="greaterOrEqual"/>
+      <import plugin="com.kcsl.sidis" version="3.3.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
