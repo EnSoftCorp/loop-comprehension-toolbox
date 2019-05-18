@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/com.kcsl.loop.feature_3.3.8.201905181414.jar" id="com.kcsl.loop.feature" version="3.3.8.201905181414">
+      <category name="com.ensoftcorp.open.loop.comprehension"/>
+   </feature>
+   <category-def name="com.ensoftcorp.open.loop.comprehension" label="Loop Comprehension Toolbox">
+      <description>
+         A suite of tools to reason about loops
+      </description>
+   </category-def>
+</site>

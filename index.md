@@ -23,7 +23,7 @@ The Loop Comprehension Toolbox project supports the following.
 ## Getting Started
 Ready to get started?
 
-1. First [install](/loop-comprehension-toolbox/install) the Slicing Toolbox plugin
+1. First [install](/loop-comprehension-toolbox/install) the Loop Comprehension Toolbox plugin
 2. Then check out the provided [tutorials](/loop-comprehension-toolbox/tutorials) to jump start your analysis
 
 ## Source Code
