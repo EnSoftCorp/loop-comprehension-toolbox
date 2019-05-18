@@ -4,7 +4,7 @@ Bundle-Name: Loop
 Bundle-SymbolicName: com.kcsl.loop;singleton:=true
 Bundle-Version: 3.3.8.qualifier
 Bundle-Activator: com.kcsl.loop.Activator
-Bundle-Vendor: KCSL
+Bundle-Vendor: KCSL/EnSoft Corp.
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  com.ensoftcorp.open.commons;bundle-version="3.3.8";visibility:=reexport,

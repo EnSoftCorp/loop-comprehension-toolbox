@@ -4,7 +4,7 @@ Bundle-Name: Catalog
 Bundle-SymbolicName: com.kcsl.loop.catalog;singleton:=true
 Bundle-Version: 3.3.8.qualifier
 Bundle-Activator: com.kcsl.loop.catalog.Activator
-Bundle-Vendor: KCSL
+Bundle-Vendor: KCSL/EnSoft Corp.
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  com.kcsl.loop;bundle-version="3.3.8",
