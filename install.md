@@ -27,7 +27,7 @@ Note: If you're installing from source, make sure to either install or grab sour
 ## Changelog
 
 ### 3.3.8
-- New Loop Catalog View with more Features
+- New Loop Catalog View with more Features, Filter View is now obsolete
 - Performance Improvements
 
 ### 3.1.0
