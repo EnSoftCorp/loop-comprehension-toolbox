@@ -24,4 +24,4 @@ First, navigate to `Window` &gt; `Show View` &gt; `Other...` &gt; `Loop Catalog 
 
 A detailed walkthrough of how to detect an ACV using Loop Catalog View is demonstrated in the following video
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/LKk6TR_u8ys" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/LtaOYxo7AWI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
