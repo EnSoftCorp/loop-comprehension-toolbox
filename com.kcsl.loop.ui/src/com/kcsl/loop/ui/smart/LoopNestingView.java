@@ -1,6 +1,5 @@
 package com.kcsl.loop.ui.smart;
 
-import com.ensoftcorp.atlas.core.db.graph.Node;
 import com.ensoftcorp.atlas.core.markup.Markup;
 import com.ensoftcorp.atlas.core.query.Q;
 import com.ensoftcorp.atlas.core.query.Query;
@@ -14,16 +13,15 @@ import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.commons.highlighter.CFGHighlighter;
 
 /**
- * Input: One or more Methods
+ * Input: One or more Methods or Loop Headers
  *
  *
- * Output: For each input Method, the Loop Call Graph. If a Method has a Loop or
- * can reach a Method which has a loop, it will be in the call graph. Otherwise
- * the result is the empty graph.
+ * Output: For each input method, all the loop headers contained with induced
+ * Loop Child edges are shown. For each input loop header, all the loop headers 
+ * connected to it by Loop Child edges (in either direction) are shown.
  *
- *
- * Highlights: * Methods containing loops == bright BLUE * Call edges which may
- * have been from a CallSite within a loop == ORANGE
+ * Highlights: * Selected Loop/Method = YELLOW, Loop Headers = BLUE
+ * the deeper the loop header, the darker the shade of BLUE used.
  *
  */
 public class LoopNestingView extends FilteringAtlasSmartViewScript implements AtlasSmartViewScript {
@@ -62,14 +60,14 @@ public class LoopNestingView extends FilteringAtlasSmartViewScript implements At
 		Q nestingGraph = Common.empty();
 
 		if (loopHeaderOrMethod.nodes(XCSG.Method).eval().nodes().size() > 0) {
-			nestingGraph = loopHeaderOrMethod.contained()
+			nestingGraph = nestingGraph.union(loopHeaderOrMethod.contained()
 					.nodes(XCSG.Loop)
-					.induce(Query.universe().edges(XCSG.LoopChild));
+					.induce(Query.universe().edges(XCSG.LoopChild)));
 		} else if (loopHeaderOrMethod.nodes(XCSG.Loop).eval().nodes().size() > 0) {
-			Node loopHeader = loopHeaderOrMethod.nodes(XCSG.Loop).eval().nodes().one();
-			nestingGraph = Common.toQ(CommonQueries.getContainingFunction(loopHeader)).contained()
-					.nodes(XCSG.Loop)
-					.induce(Query.universe().edges(XCSG.LoopChild));
+			nestingGraph = nestingGraph.union(loopHeaderOrMethod.nodes(XCSG.Loop)
+					       .reverseOn(Query.universe().edges(XCSG.LoopChild)));
+			nestingGraph = nestingGraph.union(loopHeaderOrMethod.nodes(XCSG.Loop)
+				       .forwardOn(Query.universe().edges(XCSG.LoopChild)));
 		}
 		return nestingGraph;
 	}
