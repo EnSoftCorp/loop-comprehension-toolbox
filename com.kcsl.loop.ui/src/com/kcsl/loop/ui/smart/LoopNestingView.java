@@ -61,14 +61,13 @@ public class LoopNestingView extends FilteringAtlasSmartViewScript implements At
 
 		if (loopHeaderOrMethod.nodes(XCSG.Method).eval().nodes().size() > 0) {
 			nestingGraph = nestingGraph.union(loopHeaderOrMethod.contained()
-					.nodes(XCSG.Loop)
-					.induce(Query.universe().edges(XCSG.LoopChild)));
+					.nodes(XCSG.Loop));
 		} else if (loopHeaderOrMethod.nodes(XCSG.Loop).eval().nodes().size() > 0) {
 			nestingGraph = nestingGraph.union(loopHeaderOrMethod.nodes(XCSG.Loop)
-					       .reverseOn(Query.universe().edges(XCSG.LoopChild)));
+					       .reverseOn(Query.universe().edges(XCSG.LoopChild)).nodes(XCSG.Loop));
 			nestingGraph = nestingGraph.union(loopHeaderOrMethod.nodes(XCSG.Loop)
-				       .forwardOn(Query.universe().edges(XCSG.LoopChild)));
+				       .forwardOn(Query.universe().edges(XCSG.LoopChild)).nodes(XCSG.Loop));
 		}
-		return nestingGraph;
+		return nestingGraph.induce(Query.universe().edges(XCSG.LoopChild));
 	}
 }
