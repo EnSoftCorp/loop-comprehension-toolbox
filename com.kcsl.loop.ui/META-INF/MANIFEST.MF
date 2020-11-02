@@ -2,20 +2,20 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ui
 Bundle-SymbolicName: com.kcsl.loop.ui;singleton:=true
-Bundle-Version: 3.3.8.qualifier
+Bundle-Version: 3.6.0.qualifier
 Bundle-Activator: com.kcsl.loop.ui.Activator
 Bundle-Vendor: KCSL/EnSoft Corp.
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- com.kcsl.loop.catalog;bundle-version="3.3.8",
- com.kcsl.loop.lcg;bundle-version="3.3.8",
- com.kcsl.loop.taint;bundle-version="3.3.8",
- com.kcsl.loop;bundle-version="3.3.8",
- com.ensoftcorp.open.pcg;bundle-version="3.3.8",
- com.kcsl.loop.codemap;bundle-version="3.3.8",
+ com.kcsl.loop.catalog;bundle-version="3.6.0",
+ com.kcsl.loop.lcg;bundle-version="3.6.0",
+ com.kcsl.loop.taint;bundle-version="3.6.0",
+ com.kcsl.loop;bundle-version="3.6.0",
+ com.ensoftcorp.open.pcg;bundle-version="3.6.0",
+ com.kcsl.loop.codemap;bundle-version="3.6.0",
  com.fasterxml.jackson.core;bundle-version="2.9.2",
  com.fasterxml.jackson.databind;bundle-version="2.9.2",
- com.kcsl.sidis;bundle-version="3.3.8"
+ com.kcsl.sidis;bundle-version="3.6.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: com.kcsl.loop.ui
 Bundle-ActivationPolicy: lazy

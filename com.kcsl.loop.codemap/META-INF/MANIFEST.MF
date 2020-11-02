@@ -2,15 +2,15 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Codemap
 Bundle-SymbolicName: com.kcsl.loop.codemap;singleton:=true
-Bundle-Version: 3.3.8.qualifier
+Bundle-Version: 3.6.0.qualifier
 Bundle-Activator: com.kcsl.loop.codemap.Activator
 Bundle-Vendor: KCSL/EnSoft Corp.
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- com.kcsl.loop;bundle-version="3.3.8",
- com.kcsl.loop.taint;bundle-version="3.3.8",
- com.kcsl.loop.lcg;bundle-version="3.3.8",
- com.kcsl.loop.catalog;bundle-version="3.3.8"
+ com.kcsl.loop;bundle-version="3.6.0",
+ com.kcsl.loop.taint;bundle-version="3.6.0",
+ com.kcsl.loop.lcg;bundle-version="3.6.0",
+ com.kcsl.loop.catalog;bundle-version="3.6.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: com.kcsl.loop.codemap
 Bundle-ActivationPolicy: lazy

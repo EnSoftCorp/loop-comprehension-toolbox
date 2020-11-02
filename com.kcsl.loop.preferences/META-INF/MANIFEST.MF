@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Preferences
 Bundle-SymbolicName: com.kcsl.loop.preferences;singleton:=true
-Bundle-Version: 3.3.8.qualifier
+Bundle-Version: 3.6.0.qualifier
 Bundle-Activator: com.kcsl.loop.preferences.Activator
 Bundle-Vendor: KCSL/EnSoft Corp.
 Require-Bundle: org.eclipse.ui,

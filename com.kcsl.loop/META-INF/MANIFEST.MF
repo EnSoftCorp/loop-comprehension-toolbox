@@ -2,17 +2,17 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Loop
 Bundle-SymbolicName: com.kcsl.loop;singleton:=true
-Bundle-Version: 3.3.8.qualifier
+Bundle-Version: 3.6.0.qualifier
 Bundle-Activator: com.kcsl.loop.Activator
 Bundle-Vendor: KCSL/EnSoft Corp.
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- com.ensoftcorp.open.commons;bundle-version="3.3.8";visibility:=reexport,
- com.ensoftcorp.open.jimple.commons;bundle-version="3.3.8";visibility:=reexport,
- com.ensoftcorp.open.java.commons;bundle-version="3.3.8";visibility:=reexport,
- com.kcsl.loop.preferences;bundle-version="3.3.8";visibility:=reexport,
+ com.ensoftcorp.open.commons;bundle-version="3.6.0";visibility:=reexport,
+ com.ensoftcorp.open.jimple.commons;bundle-version="3.6.0";visibility:=reexport,
+ com.ensoftcorp.open.java.commons;bundle-version="3.6.0";visibility:=reexport,
+ com.kcsl.loop.preferences;bundle-version="3.6.0";visibility:=reexport,
  org.jgrapht;bundle-version="1.0.1";visibility:=reexport,
- com.ensoftcorp.abp.common;bundle-version="3.3.8"
+ com.ensoftcorp.abp.common;bundle-version="3.6.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: com.kcsl.loop
 Bundle-ActivationPolicy: lazy

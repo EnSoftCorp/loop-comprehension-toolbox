@@ -2,14 +2,14 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Lcg
 Bundle-SymbolicName: com.kcsl.loop.lcg;singleton:=true
-Bundle-Version: 3.3.8.qualifier
+Bundle-Version: 3.6.0.qualifier
 Bundle-Activator: com.kcsl.loop.lcg.Activator
 Bundle-Vendor: KCSL/EnSoft Corp.
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- com.kcsl.loop;bundle-version="3.3.8",
+ com.kcsl.loop;bundle-version="3.6.0",
  net.ontopia.utils;bundle-version="5.2.2",
- com.ensoftcorp.open.pcg;bundle-version="3.3.8"
+ com.ensoftcorp.open.pcg;bundle-version="3.6.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: com.kcsl.loop.lcg
 Bundle-ActivationPolicy: lazy
