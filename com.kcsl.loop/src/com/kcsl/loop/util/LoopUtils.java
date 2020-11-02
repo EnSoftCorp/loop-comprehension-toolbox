@@ -23,6 +23,8 @@ import com.kcsl.loop.log.Log;
 public class LoopUtils {
 
 	public static final String NESTING_DEPTH = "NESTING_DEPTH";
+	
+	public final static String INTERPROCEDURAL_DEPTH = "INTERPROCEDURAL_DEPTH";
 
 	static long edgeCount = 0;
 	static long skippedEdgeCount = 0;

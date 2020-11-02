@@ -55,7 +55,11 @@ public class LoopCatalogCodemapStage extends PrioritizedCodemapStage {
 			long processed = 0;
 			Log.debug("Number of loops: " + size); //$NON-NLS-1$
 			for(Node loopHeader : new AtlasHashSet<Node>(loopHeaders.eval().nodes())){
-				Monotonicity.bounds(loopHeader);
+				try {
+					Monotonicity.bounds(loopHeader);
+				} catch(NullPointerException e) {
+					// It's fine, skip that loop and continue
+				}
 				processed++;
 				if (processed%10==0) {
 					Log.debug("Loops processed: " + processed + "/" + size);  //$NON-NLS-1$//$NON-NLS-2$

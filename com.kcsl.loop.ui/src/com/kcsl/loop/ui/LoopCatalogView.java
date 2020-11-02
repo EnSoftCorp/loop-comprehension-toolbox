@@ -197,6 +197,12 @@ public class LoopCatalogView extends GraphSelectionProviderView {
 		tblclmnNestingDepth.setWidth(100);
 		tblclmnNestingDepth.setText("Nesting Depth");
 		tblclmnNestingDepth.setData("loopInfoField","nestingDepth");
+		
+		TableColumn tblclmninterProceduralDepth = new TableColumn(tableOfLoops, SWT.NONE);
+		tblclmninterProceduralDepth.setToolTipText("InterproceduralDepth to which this loop is nested");
+		tblclmninterProceduralDepth.setWidth(100);
+		tblclmninterProceduralDepth.setText("Interprocedural Nesting Depth");
+		tblclmninterProceduralDepth.setData("loopInfoField","interProceduralDepth");
 
 		TableColumn tblclmnMonotonic = new TableColumn(tableOfLoops, SWT.NONE);
 		tblclmnMonotonic.setToolTipText("Whether the loop is monotonic or not");
@@ -1101,7 +1107,8 @@ public class LoopCatalogView extends GraphSelectionProviderView {
 		    		loopInfo.getContainer(), 
 		    		loopInfo.getLoopStatement(), 
 		    		loopInfo.getNumTerminatingConditions()+"",
-		    		loopInfo.getNestingDepth()+"", 
+		    		loopInfo.getNestingDepth()+"",
+		    		loopInfo.getInterProceduralDepth()+"",
 		    		loopInfo.isMonotonicity()+"", 
 		    		loopInfo.getLoopRuntimeInfo().getIterationCount()+"",
 		    		loopInfo.getLoopRuntimeInfo().getAvgTimeForLoopExecution()+"",
@@ -1306,6 +1313,7 @@ public class LoopCatalogView extends GraphSelectionProviderView {
 		String loopStatement = LoopCallSiteStats.getLoopStatement(loopHeader);
 		String container = Common.toQ(loopHeader).parent().eval().nodes().one().getAttr(XCSG.name).toString();
 		Integer nestingDepth = (loopHeader.getAttr(LoopUtils.NESTING_DEPTH)!=null)?Integer.parseInt(loopHeader.getAttr(LoopUtils.NESTING_DEPTH).toString()):0;
+		Integer interProceduralDepth = (loopHeader.getAttr(LoopUtils.INTERPROCEDURAL_DEPTH)!=null)?Integer.parseInt(loopHeader.getAttr(LoopUtils.INTERPROCEDURAL_DEPTH).toString()):0;
 		boolean monotonicity = (loopHeader.taggedWith(MonotonicityPatternConstants.MONOTONIC_LOOP)?true:false);
 		
 		Q tcs = TerminatingConditions.findBoundaryConditionsForLoopHeader(loopHeader);
@@ -1444,7 +1452,7 @@ public class LoopCatalogView extends GraphSelectionProviderView {
 		LoopRuntimeInfo runtimeInfo = getLoopRuntimeInfo(loopHeader);
 
 		LoopInfo loopInfo = new LoopInfo(headerID, projectString, packageName, typeName, methodName, loopStatement, container, 
-			numTerminatingConditions, nestingDepth, monotonicity, loopTerminationPattern, lowerBound, upperBound, 
+			numTerminatingConditions, nestingDepth, interProceduralDepth, monotonicity, loopTerminationPattern, lowerBound, upperBound, 
 			dfNodes, dfEdges, tgNodes, tgEdges, cfNodes, cfEdges, lcefgNodes, lcefgEdges, 
 			numCfEntryPointsFromWhichLoopIsReachable, cfEntryPointsFromWhichLoopIsReachable, 
 			numDfEntryPointsFromWhichLoopIsReachable, dfEntryPointsFromWhichLoopIsReachable,

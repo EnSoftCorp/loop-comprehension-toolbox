@@ -46,6 +46,7 @@ public class LoopInfo {
 	
 	int numTerminatingConditions;
 	int nestingDepth;
+	int interProceduralDepth;
 	boolean monotonicity;
 	String pattern;
 	String lowerBound;
@@ -130,7 +131,7 @@ public class LoopInfo {
 	
 	
 	public LoopInfo(int headerID, String projectString, String packageName, String typeName, String methodName,
-			String loopStatement, String container, int numTerminatingConditions, int nestingDepth,
+			String loopStatement, String container, int numTerminatingConditions, int nestingDepth, int interProceduralDepth,
 			boolean monotonicity, String pattern, String lowerBound, String upperBound, long dfNodes, long dfEdges,
 			long tgNodes, long tgEdges, long cfNodes, long cfEdges, long lcefgNodes, long lcefgEdges,  
 			int numCfEntryPointsFromWhichLoopIsReachable, List<String> cfEntryPointsFromWhichLoopIsReachable, 
@@ -155,6 +156,7 @@ public class LoopInfo {
 		this.container = container;
 		this.numTerminatingConditions = numTerminatingConditions;
 		this.nestingDepth = nestingDepth;
+		this.interProceduralDepth = interProceduralDepth;
 		this.monotonicity = monotonicity;
 		this.pattern = pattern;
 		this.lowerBound = lowerBound;
@@ -225,7 +227,7 @@ public class LoopInfo {
 
 	public void updateFieldMaps() {
 		updateFieldMaps(headerID, projectString, packageName, typeName, methodName, loopStatement, container,
-				numTerminatingConditions, nestingDepth, monotonicity, pattern, lowerBound, upperBound, dfNodes, dfEdges,
+				numTerminatingConditions, nestingDepth, interProceduralDepth, monotonicity, pattern, lowerBound, upperBound, dfNodes, dfEdges,
 				tgNodes, tgEdges, cfNodes, cfEdges, lcefgNodes, lcefgEdges, 
 				numCfEntryPointsFromWhichLoopIsReachable, cfEntryPointsFromWhichLoopIsReachable, 
 				numDfEntryPointsFromWhichLoopIsReachable, dfEntryPointsFromWhichLoopIsReachable, 
@@ -243,7 +245,7 @@ public class LoopInfo {
 	}
 	
 	private void updateFieldMaps(int headerID, String projectString, String packageName, String typeName,
-			String methodName, String loopStatement, String container, int numTerminatingConditions, int nestingDepth,
+			String methodName, String loopStatement, String container, int numTerminatingConditions, int nestingDepth, int interProceduralDepth, 
 			boolean monotonicity, String pattern, String lowerBound, String upperBound, long dfNodes, long dfEdges,
 			long tgNodes, long tgEdges, long cfNodes, long cfEdges, long lcefgNodes, long lcefgEdges,
 			int numCfEntryPointsFromWhichLoopIsReachable, List<String> cfEntryPointsFromWhichLoopIsReachable,
@@ -268,6 +270,7 @@ public class LoopInfo {
 		fieldMap.put("container", container+"");
 		fieldMap.put("numTerminatingConditions", numTerminatingConditions+"");
 		fieldMap.put("nestingDepth", nestingDepth+"");
+		fieldMap.put("interProceduralDepth", interProceduralDepth+"");
 		fieldMap.put("monotonicity", monotonicity+"");
 		fieldMap.put("pattern", pattern+"");
 		fieldMap.put("lowerBound", lowerBound+"");
@@ -434,6 +437,14 @@ public class LoopInfo {
 
 	public void setNestingDepth(int nestingDepth) {
 		this.nestingDepth = nestingDepth;
+	}
+	
+	public int getInterProceduralDepth() {
+		return interProceduralDepth;
+	}
+	
+	public void setInterProceduralDepth(int interProceduralDepth) {
+		this.interProceduralDepth = interProceduralDepth;
 	}
 
 	public boolean isMonotonicity() {

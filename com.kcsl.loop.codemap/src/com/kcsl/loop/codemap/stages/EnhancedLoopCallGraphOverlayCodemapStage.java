@@ -41,7 +41,7 @@ public class EnhancedLoopCallGraphOverlayCodemapStage extends PrioritizedCodemap
 		boolean runIndexer = LoopPreferences.isEnhancedLoopCallGraphOverlayEnabled();
 		if(runIndexer){
 			Log.info("Adding Enhanced Loop Call Graph Overlay...");
-			new EnhancedLoopCallGraph().run(monitor);
+			// new EnhancedLoopCallGraph().run(monitor);
 			new LoopCallGraph().calculateLoopNestingHeight();
 		}
 		return runIndexer;
