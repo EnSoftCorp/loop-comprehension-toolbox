@@ -6,6 +6,7 @@ import com.ensoftcorp.open.commons.codemap.PrioritizedCodemapStage;
 import com.ensoftcorp.open.jimple.commons.loops.DecompiledLoopIdentificationCodemapStage;
 import com.kcsl.loop.codemap.log.Log;
 import com.kcsl.loop.lcg.EnhancedLoopCallGraph;
+import com.kcsl.loop.lcg.LoopCallGraph;
 import com.kcsl.loop.preferences.LoopPreferences;
 
 /**
@@ -41,6 +42,7 @@ public class EnhancedLoopCallGraphOverlayCodemapStage extends PrioritizedCodemap
 		if(runIndexer){
 			Log.info("Adding Enhanced Loop Call Graph Overlay...");
 			new EnhancedLoopCallGraph().run(monitor);
+			new LoopCallGraph().calculateLoopNestingHeight();
 		}
 		return runIndexer;
 	}

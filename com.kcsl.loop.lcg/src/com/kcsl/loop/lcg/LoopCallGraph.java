@@ -18,42 +18,49 @@ import com.ensoftcorp.atlas.core.markup.IMarkup;
 import com.ensoftcorp.atlas.core.markup.Markup;
 import com.ensoftcorp.atlas.core.markup.MarkupProperty;
 import com.ensoftcorp.atlas.core.query.Q;
+import com.ensoftcorp.atlas.core.query.Query;
 import com.ensoftcorp.atlas.core.script.Common;
 import com.ensoftcorp.atlas.core.xcsg.XCSG;
+import com.ensoftcorp.atlas.ui.viewer.graph.DisplayUtil;
 import com.ensoftcorp.open.commons.analysis.CallSiteAnalysis;
 import com.ensoftcorp.open.commons.analysis.CommonQueries;
 import com.ensoftcorp.open.commons.ui.utilities.DisplayUtils;
+import com.ensoftcorp.open.commons.xcsg.Toolbox;
 import com.ensoftcorp.open.jimple.commons.loops.DecompiledLoopIdentification.CFGNode;
 import com.kcsl.loop.lcg.log.Log;
 
 public class LoopCallGraph {
-	
+
 	/**
 	 * An integer attribute added to a CFG Node to indicate the intra-procedural loop nesting depth
 	 */
 	public final static String NESTING_DEPTH = "NESTING_DEPTH";
+
+	public final static String LCG_DEPTH = "LCG_DEPTH";
 	
+	public final static String INTERPROCEDURAL_DEPTH = "INTERPROCEDURAL_DEPTH";
+
 	/**
 	 * A call graph, consisting of XCSG.Method nodes and XCSG.Call edges
 	 */
 	private Q callContext;
-	
+
 	/**
 	 * The call graph from call sites to methods
 	 */
 	private Q callsitesCallEdges() { return universe().edges(XCSG.InvokedFunction, XCSG.InvokedSignature); };
-	
+
 	public LoopCallGraph() {
 		this.callContext = resolve(null, universe().edges(XCSG.Call));
 	}
-	
+
 	/**
 	 * @param callContext A call graph, consisting of XCSG.Method nodes and XCSG.Call edges
 	 */
 	public LoopCallGraph(Q callContext) {
 		this.callContext = resolve(null, callContext);
 	}
-	
+
 	/**
 	 * Constructs the loop call graph (lcg) of a given system, An lcg is a subset of the system's call graph
 	 * where the roots are the root methods containing loops and the leaves are the leaf methods containing loops 
@@ -80,7 +87,7 @@ public class LoopCallGraph {
 		Q lcgQ = callEdges.reverse(loopingMethods);
 		return lcgQ;
 	}
-	
+
 	/**
 	 * Returns a Highlighter coloring the methods containing loops and edges corresponding to call from within loops
 	 * 
@@ -93,22 +100,22 @@ public class LoopCallGraph {
 		AtlasSet<Edge> callEdgesFromWithinLoops = new AtlasHashSet<Edge>();
 		// Get all the call sites
 		Q allCallsites = universe().nodesTaggedWithAll(XCSG.CallSite);
-		
+
 		// Retrieve the CFG nodes that are containing the call sites and are part of a loop
 		Q loopingCFGNodes = getContainingLoopingCFGNodes(allCallsites);
-		
+
 		//Iterate through the looping CFG nodes and compute the call graph for the methods called from within loops
 		for(Node cfgNode : loopingCFGNodes.eval().nodes()){
 			// Get the methods containing the current cfgNode
 			Q caller = CommonQueries.getContainingFunctions(toQ(cfgNode));
-			
+
 			// Get the call site contained within the cfgNode
 			AtlasSet<Node> loopingCallsites = toQ(cfgNode).children().nodesTaggedWithAll(XCSG.CallSite).eval().nodes();
 			if (loopingCallsites.size() != 1){
 				Log.warning("Internal error, expected exactly one callsite");
 			}
 			Node loopingCallsite = loopingCallsites.one();
-			
+
 			// Get the possible target methods from this call site
 			Q targetMethods = CallSiteAnalysis.getTargets(Common.toQ(loopingCallsite));
 
@@ -117,7 +124,7 @@ public class LoopCallGraph {
 
 			callEdgesFromWithinLoops.addAll(subResult.eval().edges());
 		}
-		
+
 		//Highlighter h = new Highlighter(ConflictStrategy.LAST_MATCH);
 		Markup m = new Markup();
 		// Highlight methods containing loops with BLUE
@@ -130,7 +137,7 @@ public class LoopCallGraph {
 		m.setEdge(toQ(callEdgesFromWithinLoops), MarkupProperty.EDGE_COLOR, Color.ORANGE);
 		return m;
 	}
-	
+
 	/**
 	 * Calculate the depth of intra- and inter-procedural loop nesting 
 	 */
@@ -138,41 +145,68 @@ public class LoopCallGraph {
 		// Before start traversing the call graph, tag the call sites called from within loop with its intra-procedural loop nesting depth
 		Q loopingCFGNodes = TagCallSitesIntraprocedualNestingLoopingDepth();
 		Q results = Common.empty();
-		
+
 		///Iterate through the looping CFG nodes and compute the call graph for the methods called from within loops 
 		for(Node cfgNode : loopingCFGNodes.eval().nodes()){
 			// Get the methods containing the current cfgNode
 			Q caller = CommonQueries.getContainingFunctions(toQ(cfgNode));
-			
+
 			// Get the call sites containing within the cfgNode
 			Q loopingCallsites = toQ(cfgNode).children().nodesTaggedWithAll(XCSG.CallSite);
-			
+
 			// Get the invoked methods from these call sites
 			Q invokedMethods = callsitesCallEdges().successors(loopingCallsites).nodesTaggedWithAll(XCSG.Method);
-			
+
 			// The resulting call graph should be between the called and the invoked methods
 			Q subResult = getCallGraph().betweenStep(caller, invokedMethods);
 			//results = results.union((caller.union(invokedMethods)).induce(getCallGraph()));
 			results = results.union(subResult);
 		}
-		
+
 		// Retrieve the call edges from the resultant graph and color them with RED
 		AtlasSet<Edge> callEdgesFromWithinLoops = results.eval().edges();
-		
+
 		Q lcg = lcg();
 		AtlasSet<Node> methodsContainingLoops = getMethodsContainingLoops().eval().nodes();
 
 		// Iterate through the methods containing loops and compute its loop nesting depth
 		for(Node method : methodsContainingLoops){
 			// The LCG for the current method
-			Graph graph = lcg.forward(toQ(method)).eval();
-			
-			// Recursively traverse the LCG for the method and compute its loop nesting depth
-			int depth = traverse(graph, method, 1, new AtlasHashSet<Node>(), callEdgesFromWithinLoops);
-			Log.info(method.getAttr(XCSG.name) + "\t" + depth);
+			Q graph = lcg.reverse(toQ(method));
+			AtlasSet<Node> roots = graph.roots().eval().nodes();
+			// DisplayUtil.displayGraph(graph);
+
+			int depth = 0;
+			for(Node root: roots) {
+				// Recursively traverse the LCG for the method and compute its loop nesting depth
+				int temp = traverse(graph.eval(), root, 0, new AtlasHashSet<Node>(), callEdgesFromWithinLoops);
+				if(depth < temp) {
+					depth = temp;
+				}
+			}
+			method.putAttr(LCG_DEPTH,Integer.toString(depth));
+			Q loopsWithinMethod = Common.toQ(method).contained().nodes(XCSG.Loop);
+			for(Node loopWithinMethod: loopsWithinMethod.eval().nodes()) {
+				int intraDepth = Integer.parseInt(loopWithinMethod.getAttr(Toolbox.loopDepth).toString());
+				int d = intraDepth + depth - 1;
+				loopWithinMethod.putAttr(INTERPROCEDURAL_DEPTH, Integer.toString(d));
+			}
 		}
+
+		/*AtlasSet<Node> loopHeaders = Query.universe().nodes(XCSG.Loop).eval().nodes();
+		for(Node loopHeader: loopHeaders) {
+			Q loopHeaderQ = Common.toQ(loopHeader);
+			Node loopMethod = CommonQueries.getContainingFunctions(loopHeaderQ).eval().nodes().one();
+			// Graph graph = lcg.reverse(Common.toQ(loopMethod)).eval();
+			int intraDepth = Integer.parseInt(loopHeader.getAttr(NESTING_DEPTH).toString());
+			int methodDepth = Integer.parseInt(loopMethod.getAttr(LCG_DEPTH).toString());
+			int d = intraDepth + methodDepth;
+			loopHeader.putAttr(NESTING_DEPTH, Integer.toString(d));
+		}*/
+
+
 	}
-	
+
 	/**
 	 * Performs DFS traversal on the given call graph from the current node to calculate the depth of loop nesting
 	 * @param graph: The graph to traverse
@@ -199,14 +233,14 @@ public class LoopCallGraph {
 			if(callEdgesFromWithinLoops.contains(edge)){
 				// Get the call sites for the child in the caller (node)
 				Q callsites = getCallSitesForMethodInCaller(toQ(child), toQ(node));
-				
+
 				// Retrieves the set of CFG nodes containing the call sites and are part of loop
 				Q loopingCFGNodes = getContainingCFGNodes(callsites).selectNode(NESTING_DEPTH);
 				ArrayList<Integer> iDepths = new ArrayList<Integer>();
 				if(loopingCFGNodes.eval().nodes().isEmpty()){
 					DisplayUtils.show(edge, "no");
 				}
-				
+
 				// Iterate through the looping CFG nodes and compute the maximum nesting depth
 				for(Node cfgCallsite : loopingCFGNodes.eval().nodes()){
 					int intraprocedural_depth = Integer.parseInt((String)cfgCallsite.getAttr(NESTING_DEPTH));
@@ -224,7 +258,7 @@ public class LoopCallGraph {
 		}
 		return depth;
 	}
-	
+
 	/**
 	 * Returns the set of call sites for the callee in the caller
 	 * @param callee
@@ -236,7 +270,7 @@ public class LoopCallGraph {
 		Q containedCallsites = caller.contained().nodesTaggedWithAll(XCSG.CallSite).intersection(callsites);
 		return containedCallsites;
 	}
-	
+
 	/**
 	 * Returns the set of call sites for the passed method(s)
 	 * @param methods
@@ -246,7 +280,7 @@ public class LoopCallGraph {
 		Q callsites = callsitesCallEdges().predecessors(methods).nodesTaggedWithAll(XCSG.CallSite);
 		return callsites;
 	}
-	
+
 	/**
 	 * Returns the set of CFG nodes tagged with LOOP_HEADER that are containing within the passed method
 	 * @param method
@@ -256,7 +290,7 @@ public class LoopCallGraph {
 		Q loopHeaders = method.contained().nodesTaggedWithAll(XCSG.ControlFlow_Node, XCSG.Loop);
 		return loopHeaders;
 	}
-	
+
 	/**
 	 * Returns the set of control flow nodes that are part of a loop and containing the passed nodes
 	 * @param nodes
@@ -268,7 +302,7 @@ public class LoopCallGraph {
 		loopingCFGNodes = loopingCFGNodes.union(containingCFGNodes.nodesTaggedWithAll(XCSG.Loop));
 		return loopingCFGNodes;
 	}
-	
+
 	/**
 	 * Returns the set of control flow nodes that are containing the passed nodes
 	 * @param callsites
@@ -278,7 +312,7 @@ public class LoopCallGraph {
 		Q CFGNodes = callsites.parent().nodesTaggedWithAll(XCSG.ControlFlow_Node);
 		return CFGNodes;
 	}
-	
+
 	/**
 	 * Adds the attribute NESTING_DEPTH to all call sites that are part of a loop
 	 * @returns the set of CFG node containing the calls from within loops
@@ -286,11 +320,11 @@ public class LoopCallGraph {
 	private Q TagCallSitesIntraprocedualNestingLoopingDepth(){
 		// Get all call sites
 		Q allCallsites = universe().nodesTaggedWithAll(XCSG.CallSite);
-		
+
 		// Get only the containing CFG nodes that are part of a loop 
 		Q loopingCFGNodes = getContainingLoopingCFGNodes(allCallsites);
 		AtlasSet<Node> nodes = loopingCFGNodes.eval().nodes();
-		
+
 		// Iterate through the looping CFG nodes and add the NESTING_DEPTH attribute
 		for(Node node : nodes){
 			Q loopHeaders = getLoopHeadersForMethod(CommonQueries.getContainingFunctions(toQ(node)));
@@ -299,7 +333,7 @@ public class LoopCallGraph {
 		}
 		return loopingCFGNodes;
 	}
-	
+
 	/**
 	 * Returns the set of loop header for the loops that are nested within other loops
 	 * @return the set of nested loop headers
@@ -318,7 +352,7 @@ public class LoopCallGraph {
 		}
 		return nestedLoopHeaders;
 	}
-	
+
 	/**
 	 * For a given CFG Node, recursively computes the number of loops this node is nested under
 	 * @param ge the CFG node within a loop
@@ -335,7 +369,7 @@ public class LoopCallGraph {
 		}
 		return depth;
 	}
-	
+
 	/**
 	 * Retrieves the XCSG.Call graph
 	 * @return the call graph
@@ -343,19 +377,19 @@ public class LoopCallGraph {
 	public Q getCallGraph(){
 		return callContext;
 	}
-	
+
 	/**
 	 * Returns the set of methods that are containing loops that depend on the DLI algorithm
 	 * @return The set of methods containing loops
 	 */
 	public static Q getMethodsContainingLoops(){
-//		IndexingPhases.confirmLoopAnalyzer();
+		//		IndexingPhases.confirmLoopAnalyzer();
 		Q u = universe();
 		Q headers = u.nodes(XCSG.Loop);
 		Q loopingMethods = CommonQueries.getContainingFunctions(headers);
 		return loopingMethods;
 	}
-	
+
 	public int callsitesinlcg(){
 		Q lcg = lcg();
 		Q methods = lcg.nodesTaggedWithAll(XCSG.Method);
@@ -371,7 +405,7 @@ public class LoopCallGraph {
 		}
 		return count;
 	}
-	
+
 	public void check(){
 		Q lcg = lcg();
 		AtlasSet<Edge> edges = lcg.edgesTaggedWithAll(XCSG.Call).eval().edges();
@@ -385,27 +419,27 @@ public class LoopCallGraph {
 			}
 		}
 	}
-	
+
 	public Q getCallEdgesFromWithinLoops(){
-		
+
 		Q results = Common.empty();
 		// Get all the call sites
 		Q allCallsites = universe().nodesTaggedWithAll(XCSG.CallSite);
-		
+
 		// Retrieve the CFG nodes that are containing the call sites and are part of a loop
 		Q loopingCFGNodes = getContainingLoopingCFGNodes(allCallsites);
-		
+
 		//Iterate through the looping CFG nodes and compute the call graph for the methods called from within loops
 		for(Node cfgNode : loopingCFGNodes.eval().nodes()){
 			// Get the methods containing the current cfgNode
 			Q caller = CommonQueries.getContainingFunctions(toQ(cfgNode));
-			
+
 			// Get the call sites containing within the cfgNode
 			Q loopingCallsites = toQ(cfgNode).children().nodesTaggedWithAll(XCSG.CallSite);
-			
+
 			// Get the invoked methods from these call sites
 			Q invokedMethods = callsitesCallEdges().successors(loopingCallsites).nodesTaggedWithAll(XCSG.Method);
-			
+
 			// The resulting call graph should be between the called and the invoked methods
 			Q subResult = getCallGraph().betweenStep(caller, invokedMethods);
 
