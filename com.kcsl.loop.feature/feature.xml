@@ -2,7 +2,7 @@
 <feature
       id="com.kcsl.loop.feature"
       label="Loop Comprehension Toolbox"
-      version="3.3.8.qualifier"
+      version="3.6.0.qualifier"
       provider-name="KCSL/EnSoft Corp.">
 
    <description url="https://ensoftcorp.github.io/loop-comprehension-toolbox/">
