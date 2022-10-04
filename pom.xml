@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.ensoftcorp.open</groupId>
+    <artifactId>atlas-toolboxes</artifactId>
+    <version>4.2.2-SNAPSHOT</version>
+  </parent>
+   
+  <groupId>com.kcsl</groupId>
+  <artifactId>loop</artifactId>
+  <version>4.2.2-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Loop Comprehension Toolbox</name>
+
+  <modules>
+    <module>com.kcsl.loop</module>
+    <module>com.kcsl.loop.catalog</module>
+    <module>com.kcsl.loop.codemap</module>
+    <module>com.kcsl.loop.feature</module>
+    <module>com.kcsl.loop.lcg</module>
+    <module>com.kcsl.loop.preferences</module>
+    <module>com.kcsl.loop.taint</module>
+    <module>com.kcsl.loop.ui</module>
+  </modules>
+
+</project>
